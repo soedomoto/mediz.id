@@ -64,7 +64,7 @@ export default function BlogLayout(props: RouteSectionProps) {
         <div class="flex h-16 items-center px-4">
           <MainNavigation />
           <div class="ml-auto flex items-center space-x-4">
-            <RoleSelector
+            {/* <RoleSelector
               roles={userSess()?.roles || []}
               value={userSess()?.session?.role}
               onChange={(value) => {
@@ -72,7 +72,7 @@ export default function BlogLayout(props: RouteSectionProps) {
                   changeRoleAction(value);
                 }
               }}
-            />
+            /> */}
             <UserNavigation />
           </div>
         </div>
