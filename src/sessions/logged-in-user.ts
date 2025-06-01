@@ -1,5 +1,4 @@
 import { useSession } from "vinxi/http";
-import { caller } from "~/routes/(api)/api/trpc/router";
 
 type SessionData = {
   email?: string;
@@ -15,19 +14,6 @@ export async function useLoggedInUserSession() {
   });
 
   return session;
-}
-
-export async function getLoggedInUserSession() {
-  "use server";
-
-  const session = await useLoggedInUserSession();
-  if (!session.data) {
-    return null;
-  }
-
-  const user = await caller.loadUsersByEmail({ email: session.data.email || "" });
-
-  return { ...session.data, user };
 }
 
 export async function updateLoggedInUserSession(data: SessionData) {

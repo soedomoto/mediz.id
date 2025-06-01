@@ -3,11 +3,11 @@ import { Button } from "~/components/ui/button";
 import { Grid } from "~/components/ui/grid";
 import { TextField, TextFieldErrorMessage, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
 import { createForm, email, minLength, required } from "@modular-forms/solid";
-import { action, createAsync, query, redirect, RouteDefinition, useAction, useSearchParams, useSubmission } from "@solidjs/router";
+import { action, createAsync, query, redirect, reload, useAction, useSearchParams, useSubmission } from "@solidjs/router";
 import { caller } from "~/routes/(api)/api/trpc/router";
-import { Callout, CalloutContent, CalloutTitle } from "~/components/ui/callout";
-import { onMount, Show } from "solid-js";
-import { getLoggedInUserSession, updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
+import { Callout, CalloutContent } from "~/components/ui/callout";
+import { Show } from "solid-js";
+import { updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
 
 type AuthForm = {
   email: string;
@@ -17,8 +17,8 @@ type AuthForm = {
 const checkLoggedInUser = query(async (next?: string): Promise<void> => {
   "use server"
 
-  const user = await getLoggedInUserSession()
-  if (user) {
+  const session = await useLoggedInUserSession();
+  if (session?.data?.email) {
     throw redirect(decodeURIComponent(next || "/"));
   }
 }, "checkLoggedInUser");
