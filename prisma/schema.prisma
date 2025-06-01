@@ -1,0 +1,1716 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // provider          = "sqlserver"
+  provider          = "postgresql"
+  url               = env("FASKESID_DB_URL")
+  shadowDatabaseUrl = env("FASKESID_SHADOW_DB_URL")
+  directUrl         = env("FASKESID_DB_DIRECT_URL")
+}
+
+model seeders {
+  id          String   @id @default(cuid())
+  seeder_name String   @unique
+  started_at  DateTime @default(now())
+  finished_at DateTime @default(now())
+}
+
+// == USER BLOCK ==
+
+model user {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("users_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("users_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  nik           String?  @db.VarChar(255)
+  email         String?  @db.VarChar(255)
+  handphone     String?  @db.VarChar(255)
+  password      String
+
+  profile profile? @relation("profile")
+
+  userRoles                                              userRole[]                                        @relation("user_roles")
+  jabatanPegawai                                         jabatanPegawai[]                                  @relation("jabatan_pegawai")
+  adminFaskeses                                          adminFaskes[]                                     @relation("user_admin_faskes")
+  adminPendaftaranFaskeses                               adminPendaftaranFaskes[]                          @relation("user_admin_pendaftaran_faskes")
+  pasiens                                                pasien[]                                          @relation("user_pasien")
+  dokters                                                dokter[]                                          @relation("user_dokter")
+  perawats                                               perawat[]                                         @relation("user_perawat")
+  usersCreated                                           user[]                                            @relation("users_created")
+  usersUpdated                                           user[]                                            @relation("users_updated")
+  profileCreated                                         profile[]                                         @relation("profile_created")
+  profileUpdated                                         profile[]                                         @relation("profile_updated")
+  rolesCreated                                           role[]                                            @relation("roles_created")
+  rolesUpdated                                           role[]                                            @relation("roles_updated")
+  userRolesCreated                                       userRole[]                                        @relation("user_roles_created")
+  userRolesUpdated                                       userRole[]                                        @relation("user_roles_updated")
+  menusCreated                                           menu[]                                            @relation("menus_created")
+  menusUpdated                                           menu[]                                            @relation("menus_updated")
+  roleMenusCreated                                       roleMenu[]                                        @relation("role_menus_created")
+  roleMenusUpdated                                       roleMenu[]                                        @relation("role_menus_updated")
+  faksesesCreated                                        faskes[]                                          @relation("faskeses_created")
+  faksesesUpdated                                        faskes[]                                          @relation("faskeses_updated")
+  faskesprofileCreated                                   faskesProfile[]                                   @relation("faskes_profile_created")
+  faskesprofileUpdated                                   faskesProfile[]                                   @relation("faskes_profile_updated")
+  instalasiCreated                                       instalasi[]                                       @relation("instalasi_created")
+  instalasiUpdated                                       instalasi[]                                       @relation("instalasi_updated")
+  ruanganCreated                                         ruangan[]                                         @relation("ruangan_created")
+  ruanganUpdated                                         ruangan[]                                         @relation("ruangan_updated")
+  ruanganPoliUpdated                                     poli[]                                            @relation("ruangan_poli_updated")
+  ruanganPoliCreated                                     poli[]                                            @relation("ruangan_poli_created")
+  obatAlkesCategoriesCreated                             obatAlkesCategory[]                               @relation("obat_alkes_categories_created")
+  obatAlkesCategoriesUpdated                             obatAlkesCategory[]                               @relation("obat_alkes_categories_updated")
+  obatAlkesesCreated                                     obatAlkes[]                                       @relation("obat_alkeses_created")
+  obatAlkesesUpdated                                     obatAlkes[]                                       @relation("obat_alkeses_updated")
+  obatAlkesSatuansCreated                                obatAlkesSatuan[]                                 @relation("obat_alkes_satuans_created")
+  obatAlkesSatuansUpdated                                obatAlkesSatuan[]                                 @relation("obat_alkes_satuans_updated")
+  obatAlkesGolongansCreated                              obatAlkesGolongan[]                               @relation("obat_alkes_golongans_created")
+  obatAlkesGolongansUpdated                              obatAlkesGolongan[]                               @relation("obat_alkes_golongans_updated")
+  mWilCreated                                            mWil[]                                            @relation("m_wil_created")
+  mWilUpdated                                            mWil[]                                            @relation("m_wil_updated")
+  mProvCreated                                           mProv[]                                           @relation("m_prov_created")
+  mProvUpdated                                           mProv[]                                           @relation("m_prov_updated")
+  mKabCreated                                            mKab[]                                            @relation("m_kab_created")
+  mKabUpdated                                            mKab[]                                            @relation("m_kab_updated")
+  mKecCreated                                            mKec[]                                            @relation("m_kec_created")
+  mKecUpdated                                            mKec[]                                            @relation("m_kec_updated")
+  mKelCreated                                            mKel[]                                            @relation("m_kel_created")
+  mKelUpdated                                            mKel[]                                            @relation("m_kel_updated")
+  dokumenCreated                                         dokumen[]                                         @relation("dokumen_created")
+  dokumenUpdated                                         dokumen[]                                         @relation("dokumen_updated")
+  jenisPemeriksaanCreated                                jenisPemeriksaan[]                                @relation("jenis_pemeriksaan_created")
+  jenisPemeriksaanUpdated                                jenisPemeriksaan[]                                @relation("jenis_pemeriksaan_updated")
+  kuotaHarianCreated                                     kuotaHarian[]                                     @relation("kuota_harian_created")
+  kuotaHarianUpdated                                     kuotaHarian[]                                     @relation("kuota_harian_updated")
+  jadwalKlinikCreated                                    jadwalKlinik[]                                    @relation("jadwal_klinik_created")
+  jadwalKlinikUpdated                                    jadwalKlinik[]                                    @relation("jadwal_klinik_updated")
+  userGuideCreated                                       userGuide[]                                       @relation("user_guide_created")
+  userGuideUpdated                                       userGuide[]                                       @relation("user_guide_updated")
+  jabatanPegawaiCreated                                  jabatanPegawai[]                                  @relation("jabatan_pegawai_created")
+  jabatanPegawaiUpdated                                  jabatanPegawai[]                                  @relation("jabatan_pegawai_updated")
+  kelompokPegawaiCreated                                 kelompokPegawai[]                                 @relation("kelompok_pegawai_created")
+  kelompokPegawaiUpdated                                 kelompokPegawai[]                                 @relation("kelompok_pegawai_updated")
+  kelompokJabatanCreated                                 kelompokJabatan[]                                 @relation("kelompok_jabatan_created")
+  kelompokJabatanUpdated                                 kelompokJabatan[]                                 @relation("kelompok_jabatan_updated")
+  jabatanCreated                                         jabatan[]                                         @relation("jabatan_created")
+  jabatanUpdated                                         jabatan[]                                         @relation("jabatan_updated")
+  adminFaskesCreated                                     adminFaskes[]                                     @relation("admin_faskes_created")
+  adminFaskesUpdated                                     adminFaskes[]                                     @relation("admin_faskes_updated")
+  adminPendaftaranFaskesCreated                          adminPendaftaranFaskes[]                          @relation("admin_pendaftaran_faskes_created")
+  adminPendaftaranFaskesUpdated                          adminPendaftaranFaskes[]                          @relation("admin_pendaftaran_faskes_updated")
+  pasienCreated                                          pasien[]                                          @relation("pasien_created")
+  pasienUpdated                                          pasien[]                                          @relation("pasien_updated")
+  dokterCreated                                          dokter[]                                          @relation("dokter_created")
+  dokterUpdated                                          dokter[]                                          @relation("dokter_updated")
+  dokterFaskesCreated                                    dokterFaskes[]                                    @relation("dokter_faskes_created")
+  dokterFaskesUpdated                                    dokterFaskes[]                                    @relation("dokter_faskes_updated")
+  perawatFaskesCreated                                   perawatFaskes[]                                   @relation("perawat_faskes_created")
+  perawatFaskesUpdated                                   perawatFaskes[]                                   @relation("perawat_faskes_updated")
+  dokterPoliCreated                                      dokterPoli[]                                      @relation("dokter_poli_created")
+  dokterPoliUpdated                                      dokterPoli[]                                      @relation("dokter_poli_updated")
+  perawatPoliCreated                                     perawatPoli[]                                     @relation("perawat_poli_created")
+  perawatPoliUpdated                                     perawatPoli[]                                     @relation("perawat_poli_updated")
+  shiftPoliCreated                                       shiftPoli[]                                       @relation("shift_poli_created")
+  shiftPoliUpdated                                       shiftPoli[]                                       @relation("shift_poli_updated")
+  shiftDokterPoliCreated                                 shiftDokterPoli[]                                 @relation("shift_dokter_poli_created")
+  shiftDokterPoliUpdated                                 shiftDokterPoli[]                                 @relation("shift_dokter_poli_updated")
+  jadwalRutinDokterCreated                               jadwalRutinDokter[]                               @relation("jadwal_rutin_dokter_created")
+  jadwalRutinDokterUpdated                               jadwalRutinDokter[]                               @relation("jadwal_rutin_dokter_updated")
+  jadwalLiburDokterCreated                               jadwalLiburDokter[]                               @relation("jadwal_libur_dokter_created")
+  jadwalLiburDokterUpdated                               jadwalLiburDokter[]                               @relation("jadwal_libur_dokter_updated")
+  jadwalPiketDokterCreated                               jadwalPiketDokter[]                               @relation("jadwal_piket_dokter_created")
+  jadwalPiketDokterUpdated                               jadwalPiketDokter[]                               @relation("jadwal_piket_dokter_updated")
+  perawatCreated                                         perawat[]                                         @relation("perawat_created")
+  perawatUpdated                                         perawat[]                                         @relation("perawat_updated")
+  kunjunganPasienCreated                                 kunjunganPasien[]                                 @relation("kunjungan_pasien_created")
+  kunjunganPasienUpdated                                 kunjunganPasien[]                                 @relation("kunjungan_pasien_updated")
+  kunjunganAlergiObatCreated                             kunjunganPasienAlergiObat[]                       @relation("kunjungan_alergi_obat_created")
+  kunjunganAlergiObatUpdated                             kunjunganPasienAlergiObat[]                       @relation("kunjungan_alergi_obat_updated")
+  statusKunjunganPasienCreated                           statusKunjunganPasien[]                           @relation("status_kunjungan_pasien_created")
+  statusKunjunganPasienUpdated                           statusKunjunganPasien[]                           @relation("status_kunjungan_pasien_updated")
+  skriningVisualCreated                                  skriningVisual[]                                  @relation("skrining_visual_created")
+  skriningVisualUpdated                                  skriningVisual[]                                  @relation("skrining_visual_updated")
+  kesadaranCreated                                       kesadaran[]                                       @relation("kesadaran_created")
+  kesadaranUpdated                                       kesadaran[]                                       @relation("kesadaran_updated")
+  caraUkurTbCreated                                      caraUkurTinggiBadan[]                             @relation("cara_ukur_tb_created")
+  caraUkurTbUpdated                                      caraUkurTinggiBadan[]                             @relation("cara_ukur_tb_updated")
+  detakJantungCreated                                    detakJantung[]                                    @relation("detak_jantung_created")
+  detakJantungUpdated                                    detakJantung[]                                    @relation("detak_jantung_updated")
+  triageCreated                                          triage[]                                          @relation("triage_created")
+  triageUpdated                                          triage[]                                          @relation("triage_updated")
+  pemeriksaanAnatomiTubuhCreated                         pemeriksaanAnatomiTubuh[]                         @relation("pemeriksaan_anatomi_tubuh_created")
+  pemeriksaanAnatomiTubuhUpdated                         pemeriksaanAnatomiTubuh[]                         @relation("pemeriksaan_anatomi_tubuh_updated")
+  pemeriksaanKeadaanFisikCreated                         pemeriksaanKeadaanFisik[]                         @relation("pemeriksaan_keadaan_fisik_created")
+  pemeriksaanKeadaanFisikUpdated                         pemeriksaanKeadaanFisik[]                         @relation("pemeriksaan_keadaan_fisik_updated")
+  indikatorPemeriksaanKeadaanFisikCreated                indikatorPemeriksaanKeadaanFisik[]                @relation("indikator_pemeriksaan_fisik_created")
+  indikatorPemeriksaanKeadaanFisikUpdated                indikatorPemeriksaanKeadaanFisik[]                @relation("indikator_pemeriksaan_fisik_updated")
+  diagnosisKeperawatanCreated                            diagnosisKeperawatan[]                            @relation("diagnosis_keperawatan_created")
+  diagnosisKeperawatanUpdated                            diagnosisKeperawatan[]                            @relation("diagnosis_keperawatan_updated")
+  kunjunganDiagnosisKeperawatanUpdated                   kunjunganDiagnosisKeperawatan[]                   @relation("kunjungan_diagnosis_keperawatan_updated")
+  kunjunganDiagnosisKeperawatanCreated                   kunjunganDiagnosisKeperawatan[]                   @relation("kunjungan_diagnosis_keperawatan_created")
+  kunjunganDiagnosisKeperawatanKriteriaCreated           kunjunganDiagnosisKeperawatanKriteria[]           @relation("kunjungan_diagnosis_keperawatan_kriteria_created")
+  kunjunganDiagnosisKeperawatanKriteriaUpdated           kunjunganDiagnosisKeperawatanKriteria[]           @relation("kunjungan_diagnosis_keperawatan_kriteria_updated")
+  kunjunganDiagnosisKeperawatanIntervensiCreated         kunjunganDiagnosisKeperawatanIntervensi[]         @relation("kunjungan_diagnosis_keperawatan_intervensi_created")
+  kunjunganDiagnosisKeperawatanIntervensiUpdated         kunjunganDiagnosisKeperawatanIntervensi[]         @relation("kunjungan_diagnosis_keperawatan_intervensi_updated")
+  kunjunganDiagnosisKeperawatanIntervensiTambahanCreated kunjunganDiagnosisKeperawatanIntervensiTambahan[] @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan_created")
+  kunjunganDiagnosisKeperawatanIntervensiTambahanUpdated kunjunganDiagnosisKeperawatanIntervensiTambahan[] @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan_updated")
+  diagnosisKeperawatanKriteriaCreated                    diagnosisKeperawatanKriteria[]                    @relation("diagnosis_keperawatan_kriteria_created")
+  diagnosisKeperawatanKriteriaUpdated                    diagnosisKeperawatanKriteria[]                    @relation("diagnosis_keperawatan_kriteria_updated")
+  diagnosisKeperawatanIntervensiCreated                  diagnosisKeperawatanIntervensi[]                  @relation("diagnosis_keperawatan_intervensi_created")
+  diagnosisKeperawatanIntervensiUpdated                  diagnosisKeperawatanIntervensi[]                  @relation("diagnosis_keperawatan_intervensi_updated")
+  diagnosisKeperawatanIntervensiTambahanCreated          diagnosisKeperawatanIntervensiTambahan[]          @relation("diagnosis_keperawatan_intervensi_tambahan_created")
+  diagnosisKeperawatanIntervensiTambahanUpdated          diagnosisKeperawatanIntervensiTambahan[]          @relation("diagnosis_keperawatan_intervensi_tambahan_updated")
+  penyakitCreated                                        penyakit[]                                        @relation("penyakit_created")
+  penyakitUpdated                                        penyakit[]                                        @relation("penyakit_updated")
+  jenisPenyakitCreated                                   jenisPenyakit[]                                   @relation("jenis_penyakit_created")
+  jenisPenyakitUpdated                                   jenisPenyakit[]                                   @relation("jenis_penyakit_updated")
+  kasusPenyakitCreated                                   kasusPenyakit[]                                   @relation("kasus_penyakit_created")
+  kasusPenyakitUpdated                                   kasusPenyakit[]                                   @relation("kasus_penyakit_updated")
+  statusDiagnosisCreated                                 statusDiagnosis[]                                 @relation("status_diagnosis_created")
+  statusDiagnosisUpdated                                 statusDiagnosis[]                                 @relation("status_diagnosis_updated")
+  kunjunganPenyakitCreated                               kunjunganDiagnosisDokter[]                        @relation("kunjungan_penyakit_created")
+  kunjunganPenyakitUpdated                               kunjunganDiagnosisDokter[]                        @relation("kunjungan_penyakit_updated")
+  prognosaCreated                                        prognosa[]                                        @relation("prognosa_created")
+  prognosaUpdated                                        prognosa[]                                        @relation("prognosa_updated")
+  laboratoriumJenisCreated                               laboratoriumJenis[]                               @relation("laboratorium_jenis_created")
+  laboratoriumJenisUpdated                               laboratoriumJenis[]                               @relation("laboratorium_jenis_updated")
+  laboratoriumCreated                                    laboratorium[]                                    @relation("laboratorium_created")
+  laboratoriumUpdated                                    laboratorium[]                                    @relation("laboratorium_updated")
+  kunjunganLaboratoriumCreated                           kunjunganLaboratorium[]                           @relation("kunjungan_laboratorium_created")
+  kunjunganLaboratoriumUpdated                           kunjunganLaboratorium[]                           @relation("kunjungan_laboratorium_updated")
+  jabatan                                                jabatan[]
+
+  @@map("user")
+  @@unique([nik, email, handphone])
+}
+
+model profile {
+  id               String    @id @default(cuid())
+  version          Int       @default(1)
+  createdBy        String?   @map("created_by")
+  createdByUser    user?     @relation("profile_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt        DateTime  @map("created_at")
+  updatedBy        String?   @map("updated_by")
+  updatedByUser    user?     @relation("profile_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt        DateTime  @map("updated_at")
+  userId           String?   @unique @map("user_id")
+  user             user?     @relation("profile", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  nip              String?   @db.VarChar(255)
+  nama             String?   @db.VarChar(255)
+  golongan         String?   @db.VarChar(255)
+  tanggalLahir     DateTime? @map("tanggal_lahir")
+  pasienRegistrasi String?   @map("pasien_registrasi") @db.VarChar(255)
+  jenisKelamin     String?   @map("jk") @db.VarChar(2)
+  profileWilId     String?   @map("profile_wil_id")
+  profileWil       mWil?     @relation("profile_wil", fields: [profileWilId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  profileProvId    String?   @map("profile_prov_id")
+  profileProv      mProv?    @relation("profile_prov", fields: [profileProvId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  profileKabId     String?   @map("profile_kab_id")
+  profileKab       mKab?     @relation("profile_kab", fields: [profileKabId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  profileKecId     String?   @map("profile_kec_id")
+  profileKec       mKec?     @relation("profile_kec", fields: [profileKecId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  profileKelId     String?   @map("profile_kel_id")
+  profileKel       mKel?     @relation("profile_kel", fields: [profileKelId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  // tglPensiun       String?      @db.VarChar(255)
+  // nmGol            String?      @db.VarChar(5)
+  // pangkat          String?      @db.VarChar(20)
+  // agama            String?      @db.Char(1)
+
+  @@map("profile")
+}
+
+model dokter {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("dokter_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("dokter_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  userId        String   @unique @map("user_id")
+  user          user     @relation("user_dokter", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  jadwalRutins jadwalRutinDokter[] @relation("jadwal_rutin_dokter")
+  jadwalLiburs jadwalLiburDokter[] @relation("jadwal_libur_dokter")
+  jadwalPikets jadwalPiketDokter[] @relation("jadwal_piket_dokter")
+  dokterFaskes dokterFaskes[]      @relation("dokter_faskes")
+
+  @@map("dokter")
+}
+
+model perawat {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("perawat_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("perawat_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  userId        String   @unique @map("user_id")
+  user          user     @relation("user_perawat", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  perawatFaskeses perawatFaskes[] @relation("perawat_faskes")
+
+  @@map("perawat")
+}
+
+model pasien {
+  id                String   @id @default(cuid())
+  version           Int      @default(1)
+  createdBy         String?  @map("created_by")
+  createdByUser     user?    @relation("pasien_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime @map("created_at")
+  updatedBy         String?  @map("updated_by")
+  updatedByUser     user?    @relation("pasien_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime @map("updated_at")
+  noRm              String?  @db.VarChar(255)
+  noRmLama          String?  @db.VarChar(255)
+  asuransiPenjamin  String?  @db.VarChar(255)
+  noAsuransi        String?  @db.VarChar(255)
+  noKk              String?  @db.VarChar(255)
+  kewarganegaraan   String?  @db.VarChar(255)
+  tdkBawaKtp        String?  @db.VarChar(1) //
+  nama              String?  @db.VarChar(255)
+  jk                String?  @db.VarChar(255)
+  tglLahir          String?  @db.VarChar(255)
+  tempatLahir       String?  @db.VarChar(255)
+  umur              String?  @db.VarChar(255) //
+  golDarah          String?  @db.VarChar(255)
+  noHp              String?  @db.VarChar(255)
+  prov              String?  @db.VarChar(255) //
+  kab               String?  @db.VarChar(255)
+  kec               String?  @db.VarChar(255)
+  kel               String?  @db.VarChar(255)
+  alamat            String?  @db.VarChar(255)
+  pekerjaan         String?  @db.VarChar(255)
+  agama             String?  @db.VarChar(255)
+  pendidikan        String?  @db.VarChar(255)
+  statusPerkawinan  String?  @db.VarChar(255)
+  email             String?  @db.VarChar(255)
+  penanggungJawab   String?  @db.VarChar(255)
+  hubunganDgPasien  String?  @db.VarChar(255)
+  noHpPenanggungJwb String?  @db.VarChar(255)
+  // statusGenConsent String?   @db.VarChar(255) //belum/sedang/sudah diperiksa
+  userId            String   @map("user_id")
+  user              user     @relation("user_pasien", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@map("pasien")
+}
+
+model role {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("roles_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("roles_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String?  @unique @db.VarChar(100)
+  name          String?  @db.VarChar(255) // superadmin / admin / operator / user
+
+  userRoles userRole[] @relation("user_roles")
+  roleMenus roleMenu[] @relation("role_menus")
+
+  @@map("role")
+}
+
+model userRole {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("user_roles_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("user_roles_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  userId        String   @map("user_id")
+  user          user     @relation("user_roles", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  roleId        String   @map("role_id")
+  role          role     @relation("user_roles", fields: [roleId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@unique([userId, roleId])
+  @@map("user_role")
+}
+
+model menu {
+  id                 String   @id @default(cuid())
+  version            Int      @default(1)
+  createdBy          String?  @map("created_by")
+  createdByUser      user?    @relation("menus_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt          DateTime @map("created_at")
+  updatedBy          String?  @map("updated_by")
+  updatedByUser      user?    @relation("menus_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt          DateTime @map("updated_at")
+  parentId           String?
+  parent             menu?    @relation("sub_menus", fields: [parentId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  isUnderMaintenance Boolean  @default(false)
+  order              Int      @default(1)
+  path               String?
+  icon               String?
+  label              String
+
+  subMenus  menu[]     @relation("sub_menus")
+  roleMenus roleMenu[] @relation("role_menus")
+
+  @@map("menu")
+}
+
+model roleMenu {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("role_menus_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("role_menus_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  roleId        String   @map("role_id")
+  role          role     @relation("role_menus", fields: [roleId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  menuId        String   @map("menu_id")
+  menu          menu     @relation("role_menus", fields: [menuId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("role_menu")
+}
+
+// == MASTER BLOCK ==
+
+model faskes {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("faskeses_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("faskeses_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  name          String   @db.VarChar(255)
+
+  faskesprofile            faskesProfile?           @relation("faskes_profile")
+  instalasis               instalasi[]              @relation("faskes_instalasi")
+  obatAlkeses              obatAlkes[]              @relation("obat_alkeses")
+  adminFaskes              adminFaskes[]            @relation("admin_faskes")
+  adminPendaftaranFaskeses adminPendaftaranFaskes[] @relation("admin_pendaftaran_faskes")
+  dokterFaskeses           dokterFaskes[]           @relation("dokter_faskes")
+  perawatFaskeses          perawatFaskes[]          @relation("perawat_faskes")
+  jadwalRutinDokters       jadwalRutinDokter[]      @relation("jadwal_rutin_dokter")
+  jadwalLiburDokters       jadwalLiburDokter[]      @relation("jadwal_libur_dokter")
+  jadwalPiketDokters       jadwalPiketDokter[]      @relation("jadwal_piket_dokter")
+  laboratoriums            laboratorium[]           @relation("faskes_laboratorium")
+  laboratoriumJenises      laboratoriumJenis[]      @relation("faskes_laboratorium_jenis")
+  obatAlkesCategories      obatAlkesCategory[]      @relation("obat_alkes_category")
+  obatAlkesSatuans         obatAlkesSatuan[]        @relation("obat_alkes_satuan")
+  obatAlkesGolongans       obatAlkesGolongan[]      @relation("obat_alkes_golongan")
+  skriningVisuals          skriningVisual[]         @relation("skrining_visual")
+
+  @@map("faskes")
+}
+
+model faskesProfile {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("faskes_profile_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("faskes_profile_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  faskesId      String?  @unique @map("faskes_id")
+  faskes        faskes?  @relation("faskes_profile", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  mappingPoli   String?  @db.VarChar(255)
+  satuSehatId   String?  @db.VarChar(255)
+
+  @@map("faskes_profile")
+}
+
+model adminFaskes {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("admin_faskes_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("admin_faskes_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  userId        String   @map("user_id")
+  user          user     @relation("user_admin_faskes", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("admin_faskes", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@unique([userId, faskesId])
+  @@map("admin_faskes")
+}
+
+model adminPendaftaranFaskes {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("admin_pendaftaran_faskes_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("admin_pendaftaran_faskes_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  userId        String   @map("user_id")
+  user          user     @relation("user_admin_pendaftaran_faskes", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("admin_pendaftaran_faskes", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@unique([userId, faskesId])
+  @@map("admin_pendaftaran_faskes")
+}
+
+model dokterFaskes {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("dokter_faskes_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("dokter_faskes_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("dokter_faskes", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  dokterId      String   @map("dokter_id")
+  dokter        dokter   @relation("dokter_faskes", fields: [dokterId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  dokterPolies dokterPoli[] @relation("dokter_faskes")
+
+  @@unique([faskesId, dokterId])
+  @@map("dokter_faskes")
+}
+
+model perawatFaskes {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("perawat_faskes_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("perawat_faskes_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("perawat_faskes", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  perawatId     String   @map("perawat_id")
+  perawat       perawat  @relation("perawat_faskes", fields: [perawatId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  perawatPolies perawatPoli[] @relation("perawat_faskes")
+
+  @@unique([faskesId, perawatId])
+  @@map("perawat_faskes")
+}
+
+model instalasi {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("instalasi_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("instalasi_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kode          String   @db.VarChar(50)
+  name          String   @db.VarChar(255)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("faskes_instalasi", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  ruanganPolies poli[] @relation("instalasi_poli")
+
+  @@map("instalasi")
+}
+
+model poli {
+  id            String    @id @default(cuid())
+  version       Int       @default(1)
+  createdBy     String?   @map("created_by")
+  createdByUser user?     @relation("ruangan_poli_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime  @map("created_at")
+  updatedBy     String?   @map("updated_by")
+  updatedByUser user?     @relation("ruangan_poli_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime  @map("updated_at")
+  kodePoli      String    @db.VarChar(50)
+  name          String    @db.VarChar(255)
+  instalasiId   String    @map("instalasi_id")
+  instalasi     instalasi @relation("instalasi_poli", fields: [instalasiId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  ruangans      ruangan[]     @relation("ruangan")
+  dokterPolies  dokterPoli[]  @relation("dokter_poli")
+  perawatPolies perawatPoli[] @relation("perawat_poli")
+  shiftPolies   shiftPoli[]   @relation("shift_poli")
+
+  @@map("poli")
+}
+
+model ruangan {
+  id                   String   @id @default(cuid())
+  version              Int      @default(1)
+  createdBy            String?  @map("created_by")
+  createdByUser        user?    @relation("ruangan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt            DateTime @map("created_at")
+  updatedBy            String?  @map("updated_by")
+  updatedByUser        user?    @relation("ruangan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt            DateTime @map("updated_at")
+  ruanganPoliId        String   @map("ruangan_poli")
+  ruanganPoli          poli     @relation("ruangan", fields: [ruanganPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kodeSuara            String?  @db.VarChar(20)
+  instalasi            String   @db.VarChar(50)
+  namaRuangan          String   @db.VarChar(255)
+  jenisKunjungan       String   @db.VarChar(1)
+  mappingPcare         String   @db.VarChar(50)
+  panggilPoli          String   @db.VarChar(1)
+  panggilApotek        String   @db.VarChar(1)
+  panggilLab           String   @db.VarChar(1)
+  notifSkriningLansia  String   @db.VarChar(1)
+  stRuanganTujuanResep String   @db.VarChar(1)
+  promotifPreventif    String   @db.VarChar(1)
+  mcu                  String   @db.VarChar(1)
+  defaultRuanganApotek String?  @db.VarChar(50)
+  defaultRuanganAlkes  String?  @db.VarChar(50)
+  iconRuangan          String   @db.VarChar(100)
+  ruanganAkses         String?  @db.VarChar(255)
+
+  @@map("ruangan")
+}
+
+model dokterPoli {
+  id             String       @id @default(cuid())
+  version        Int          @default(1)
+  createdBy      String?      @map("created_by")
+  createdByUser  user?        @relation("dokter_poli_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt      DateTime     @map("created_at")
+  updatedBy      String?      @map("updated_by")
+  updatedByUser  user?        @relation("dokter_poli_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt      DateTime     @map("updated_at")
+  poliId         String       @map("poli_id")
+  poli           poli         @relation("dokter_poli", fields: [poliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  dokterFaskesId String       @map("dokter_faskes_id")
+  dokterFaskes   dokterFaskes @relation("dokter_faskes", fields: [dokterFaskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  shiftDokterPolies shiftDokterPoli[] @relation("shift_dokter_poli")
+  kunjunganPasiens  kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@unique([poliId, dokterFaskesId])
+  @@map("dokter_poli")
+}
+
+model perawatPoli {
+  id              String        @id @default(cuid())
+  version         Int           @default(1)
+  createdBy       String?       @map("created_by")
+  createdByUser   user?         @relation("perawat_poli_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt       DateTime      @map("created_at")
+  updatedBy       String?       @map("updated_by")
+  updatedByUser   user?         @relation("perawat_poli_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt       DateTime      @map("updated_at")
+  poliId          String        @map("poli_id")
+  poli            poli          @relation("perawat_poli", fields: [poliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  perawatFaskesId String        @map("perawat_faskes_id")
+  perawatFaskes   perawatFaskes @relation("perawat_faskes", fields: [perawatFaskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@unique([poliId, perawatFaskesId])
+  @@map("perawat_poli")
+}
+
+model shiftPoli {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("shift_poli_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("shift_poli_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  poliId        String   @map("poli_id")
+  poli          poli     @relation("shift_poli", fields: [poliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kodeHari      Int      @map("kode_hari")
+  mulai         String   @db.VarChar(20)
+  selesai       String   @db.VarChar(20)
+  enabled       Boolean  @default(true)
+
+  shiftDokterPolies shiftDokterPoli[] @relation("shift_dokter_poli")
+  kunjunganPasiens  kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@unique([poliId, kodeHari, mulai, selesai])
+  @@map("shift_poli")
+}
+
+model shiftDokterPoli {
+  id            String     @id @default(cuid())
+  version       Int        @default(1)
+  createdBy     String?    @map("created_by")
+  createdByUser user?      @relation("shift_dokter_poli_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime   @map("created_at")
+  updatedBy     String?    @map("updated_by")
+  updatedByUser user?      @relation("shift_dokter_poli_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime   @map("updated_at")
+  dokterPoliId  String     @map("dokter_poli_id")
+  dokterPoli    dokterPoli @relation("shift_dokter_poli", fields: [dokterPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  shiftPoliId   String     @map("shift_poli_id")
+  shiftPoli     shiftPoli  @relation("shift_dokter_poli", fields: [shiftPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  enabled       Boolean    @default(true)
+
+  @@unique([dokterPoliId, shiftPoliId])
+  @@map("shift_dokter_poli")
+}
+
+model obatAlkesCategory {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("obat_alkes_categories_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("obat_alkes_categories_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String   @db.VarChar(100)
+  name          String   @db.VarChar(255)
+  color         String?  @db.VarChar(50)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("obat_alkes_category", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  obatAlkeses obatAlkes[] @relation("obat_alkeses")
+
+  @@unique([faskesId, code])
+  @@map("obat_alkes_category")
+}
+
+model obatAlkesSatuan {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("obat_alkes_satuans_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("obat_alkes_satuans_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String   @db.VarChar(100)
+  name          String   @db.VarChar(255)
+  color         String?  @db.VarChar(50)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("obat_alkes_satuan", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  obatAlkeses              obatAlkes[] @relation("obat_alkes_sediaans")
+  obatAlkesSatuanBesars    obatAlkes[] @relation("obat_alkes_satuan_besars")
+  obatAlkesSatuanKecils    obatAlkes[] @relation("obat_alkes_satuan_kecils")
+  obatAlkesSatuanTerkecils obatAlkes[] @relation("obat_alkes_satuan_terkecils")
+
+  @@unique([faskesId, code])
+  @@map("obat_alkes_satuan")
+}
+
+model obatAlkesGolongan {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("obat_alkes_golongans_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("obat_alkes_golongans_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String   @db.VarChar(100)
+  name          String   @db.VarChar(255)
+  color         String?  @db.VarChar(50)
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("obat_alkes_golongan", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  obatAlkesGolongans obatAlkes[] @relation("obat_alkes_golongans")
+
+  @@unique([faskesId, code])
+  @@map("obat_alkes_golongan")
+}
+
+model obatAlkes {
+  id                   String             @id @default(cuid())
+  version              Int                @default(1)
+  createdBy            String?            @map("created_by")
+  createdByUser        user?              @relation("obat_alkeses_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt            DateTime           @map("created_at")
+  updatedBy            String?            @map("updated_by")
+  updatedByUser        user?              @relation("obat_alkeses_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt            DateTime           @map("updated_at")
+  isUsed               Boolean            @default(true) @map("is_used")
+  faskesId             String             @map("faskes_id")
+  faskes               faskes             @relation("obat_alkeses", fields: [faskesId], references: [id])
+  code                 String?            @db.VarChar(100) /// @deprecated code is no longer required
+  categoryId           String?            @map("category_id")
+  category             obatAlkesCategory? @relation("obat_alkeses", fields: [categoryId], references: [id])
+  codeKfa              String?            @map("code_kfa") @db.VarChar(100)
+  codeAtcKbki          String?            @map("code_atc_kbki") @db.VarChar(100)
+  nieBpom              String?            @map("nie_bpom") @db.VarChar(100)
+  codeMims             String?            @map("code_mims") @db.VarChar(100)
+  name                 String             @db.VarChar(255)
+  komposisi            String?            @db.Text
+  kekuatan             String?            @db.VarChar(100)
+  sediaanId            String?            @map("sediaan_id")
+  sediaan              obatAlkesSatuan?   @relation("obat_alkes_sediaans", fields: [sediaanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  satuanBesarId        String?            @map("satuan_besar_id")
+  satuanBesar          obatAlkesSatuan?   @relation("obat_alkes_satuan_besars", fields: [satuanBesarId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  satuanKecilJumlah    Int?               @map("satuan_kecil_jumlah") /// @deprecated satuanKecilJumlah is no longer required
+  satuanKecilId        String?            @map("satuan_kecil_id")
+  satuanKecil          obatAlkesSatuan?   @relation("obat_alkes_satuan_kecils", fields: [satuanKecilId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  satuanTerkecilJumlah Int?               @map("satuan_terkecil_jumlah") /// @satuanTerkecilJumlah Code is no longer required
+  satuanTerkecilId     String?            @map("satuan_terkecil_id")
+  satuanTerkecil       obatAlkesSatuan?   @relation("obat_alkes_satuan_terkecils", fields: [satuanTerkecilId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  produsen             String?            @db.VarChar(255)
+  golonganId           String?            @map("golongan_id")
+  golongan             obatAlkesGolongan? @relation("obat_alkes_golongans", fields: [golonganId], references: [id])
+  stokMinimal          Int?               @map("stok_minimal")
+  indikasi             String?            @db.VarChar(255)
+  kontraIndikasi       String?            @map("kontra_indikasi") @db.VarChar(255)
+  efekSamping          String?            @map("efek_samping") @db.VarChar(255)
+  interaksiObat        String?            @map("interaksi_obat") @db.VarChar(255)
+  penyimpananBarang    String?            @map("penyimpanan_barang") @db.VarChar(255)
+
+  kunjunganAlergiObats kunjunganPasienAlergiObat[] @relation("kunjungan_pasien")
+
+  @@map("obat_alkes")
+}
+
+model mWil {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("m_wil_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("m_wil_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kodeProv      String   @map("kode_prov")
+  prov          mProv    @relation("wil_prov", fields: [kodeProv], references: [kodeProv], onUpdate: NoAction, onDelete: NoAction)
+  kodeKab       String?  @map("kode_kab")
+  kab           mKab?    @relation("wil_kab", fields: [kodeKab], references: [kodeKab], onUpdate: NoAction, onDelete: NoAction)
+  kodeKec       String?  @map("kode_kec")
+  kec           mKec?    @relation("wil_kec", fields: [kodeKec], references: [kodeKec], onUpdate: NoAction, onDelete: NoAction)
+  kodeKel       String?  @map("kode_kel")
+  kel           mKel?    @relation("wil_kel", fields: [kodeKel], references: [kodeKel], onUpdate: NoAction, onDelete: NoAction)
+  kodeWil       String   @unique @map("kode_wil")
+
+  profileWils profile[] @relation("profile_wil")
+
+  @@map("m_wil")
+}
+
+model mProv {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("m_prov_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("m_prov_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kodeProv      String   @unique @map("kode_prov")
+  name          String
+
+  profileProvs profile[] @relation("profile_prov")
+  mProvWils    mWil[]    @relation("wil_prov")
+  mProvKabs    mKab[]    @relation("prov_kab")
+  mProvKecs    mKec[]    @relation("prov_kec")
+  mProvKels    mKel[]    @relation("prov_kel")
+
+  @@map("m_prov")
+}
+
+model mKab {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("m_kab_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("m_kab_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kodeProv      String   @map("kode_prov")
+  prov          mProv    @relation("prov_kab", fields: [kodeProv], references: [kodeProv], onUpdate: NoAction, onDelete: NoAction)
+  kodeKab       String   @unique @map("kode_kab")
+  name          String
+
+  profileKabs profile[] @relation("profile_kab")
+  mKabWils    mWil[]    @relation("wil_kab")
+  mKabKecs    mKec[]    @relation("kab_kec")
+  mKabKels    mKel[]    @relation("kab_kel")
+
+  @@map("m_kab")
+}
+
+model mKec {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("m_kec_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("m_kec_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kodeProv      String   @map("kode_prov")
+  prov          mProv    @relation("prov_kec", fields: [kodeProv], references: [kodeProv], onUpdate: NoAction, onDelete: NoAction)
+  kodeKab       String   @map("kode_kab")
+  kab           mKab     @relation("kab_kec", fields: [kodeKab], references: [kodeKab], onUpdate: NoAction, onDelete: NoAction)
+  kodeKec       String   @unique @map("kode_kec")
+  name          String
+
+  profileKecs profile[] @relation("profile_kec")
+  mKecWils    mWil[]    @relation("wil_kec")
+  mKecKels    mKel[]    @relation("kec_kel")
+
+  @@map("m_kec")
+}
+
+model mKel {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("m_kel_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("m_kel_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kodeProv      String   @map("kode_prov")
+  prov          mProv    @relation("prov_kel", fields: [kodeProv], references: [kodeProv], onUpdate: NoAction, onDelete: NoAction)
+  kodeKab       String   @map("kode_kab")
+  kab           mKab     @relation("kab_kel", fields: [kodeKab], references: [kodeKab], onUpdate: NoAction, onDelete: NoAction)
+  kodeKec       String   @map("kode_kec")
+  kec           mKec     @relation("kec_kel", fields: [kodeKec], references: [kodeKec], onUpdate: NoAction, onDelete: NoAction)
+  kodeKel       String   @unique @map("kode_kel")
+  name          String
+
+  profileKels profile[] @relation("profile_kel")
+  mKelWils    mWil[]    @relation("wil_kel")
+
+  @@map("m_kel")
+}
+
+model kelompokPegawai {
+  id             String          @id @default(cuid())
+  version        Int             @default(1)
+  createdBy      String?         @map("created_by")
+  createdByUser  user?           @relation("kelompok_pegawai_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt      DateTime        @map("created_at")
+  updatedBy      String?         @map("updated_by")
+  updatedByUser  user?           @relation("kelompok_pegawai_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt      DateTime        @map("updated_at")
+  kodeKelJabatan String          @map("kode_kel_jabatan")
+  kelJabatan     kelompokJabatan @relation("kel_jabatan_pegawai", fields: [kodeKelJabatan], references: [kodeKelJabatan], onUpdate: NoAction, onDelete: NoAction)
+  kodeJabatan    String          @map("kode_jabatan")
+  jabatan        jabatan         @relation("jabatan_pegawai", fields: [kodeJabatan], references: [kodeJabatan], onUpdate: NoAction, onDelete: NoAction)
+
+  kelompokPegawais jabatanPegawai[] @relation("kelompok_pegawai")
+
+  @@map("kelompok_pegawai")
+}
+
+model kelompokJabatan {
+  id             String   @id @default(cuid())
+  version        Int      @default(1)
+  createdBy      String?  @map("created_by")
+  createdByUser  user?    @relation("kelompok_jabatan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt      DateTime @map("created_at")
+  updatedBy      String?  @map("updated_by")
+  updatedByUser  user?    @relation("kelompok_jabatan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt      DateTime @map("updated_at")
+  kodeKelJabatan String   @unique @map("kode_kelompok_jabatan")
+  name           String // TENAGA MEDIS / TENAGA KEPERAWATAN / TENAGA KEFARMASIAN
+  // TENAGA MEDIS - Dokter Umum / TENAGA MEDIS - Dokter Gigi / TENAGA KEPERAWATAN - Bidan / TENAGA KEPERAWATAN - Perawat / TENAGA KEPERAWATAN - Perawat Gigi / TENAGA KEFARMASIAN - Apoteker / TENAGA KEFARMASIAN - Asisten Apoteker
+  // kelompokJabatan userPegawai[] @relation("kelompok_jabatan")
+
+  kelJabatanPegawais kelompokPegawai[] @relation("kel_jabatan_pegawai")
+  kelJabatans        jabatan[]         @relation("kel_jabatan")
+
+  @@map("kelompok_jabatan")
+}
+
+model jabatan {
+  id             String          @id @default(cuid())
+  version        Int             @default(1)
+  createdBy      String?         @map("created_by")
+  createdByUser  user?           @relation("jabatan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt      DateTime        @map("created_at")
+  updatedBy      String?         @map("updated_by")
+  updatedByUser  user?           @relation("jabatan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt      DateTime        @map("updated_at")
+  kodeKelJabatan String          @map("kode_kel_jabatan")
+  kelJabatan     kelompokJabatan @relation("kel_jabatan", fields: [kodeKelJabatan], references: [kodeKelJabatan], onUpdate: NoAction, onDelete: NoAction)
+  kodeJabatan    String          @unique @map("kode_jabatan")
+  name           String // Dokter Umum / Dokter Gigi / Bidan / Perawat / Perawat Gigi / Apoteker / Asisten Apoteker
+
+  jabatanPegawais kelompokPegawai[] @relation("jabatan_pegawai")
+  // kelompokJabatan userPegawai[] @relation("kelompok_jabatan")
+  user            user?             @relation(fields: [userId], references: [id])
+  userId          String?
+
+  @@map("jabatan")
+}
+
+model jabatanPegawai {
+  id                String           @id @default(cuid())
+  version           Int              @default(1)
+  createdBy         String?          @map("created_by")
+  createdByUser     user?            @relation("jabatan_pegawai_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime         @map("created_at")
+  updatedBy         String?          @map("updated_by")
+  updatedByUser     user?            @relation("jabatan_pegawai_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime         @map("updated_at")
+  userId            String           @map("user_id")
+  user              user             @relation("jabatan_pegawai", fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kelompokPegawaiId String?          @map("kelompok_pegawai_id")
+  kelompokPegawai   kelompokPegawai? @relation("kelompok_pegawai", fields: [kelompokPegawaiId], references: [id])
+
+  // jabatanPegawai jadwalPiket[] @relation("jabatan_pegawai")
+
+  @@map("user_pegawai")
+}
+
+model dokumen {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("dokumen_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("dokumen_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String
+  name          String
+
+  @@map("dokumen")
+}
+
+model jenisPemeriksaan {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jenis_pemeriksaan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jenis_pemeriksaan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String
+  name          String // umum / konseling / gigi / KIA / laboratorium / tindakan
+
+  koutaPemeriksaans kuotaHarian[] @relation("jenis_pemeriksaan")
+
+  @@map("jenis_pemeriksaan")
+}
+
+model userGuide {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("user_guide_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("user_guide_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  code          String
+  name          String
+
+  @@map("user_guide")
+}
+
+// == NON MASTER ==
+
+model kuotaHarian {
+  id                 String           @id @default(cuid())
+  version            Int              @default(1)
+  createdBy          String?          @map("created_by")
+  createdByUser      user?            @relation("kuota_harian_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt          DateTime         @map("created_at")
+  updatedBy          String?          @map("updated_by")
+  updatedByUser      user?            @relation("kuota_harian_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt          DateTime         @map("updated_at")
+  date               DateTime         @db.Date
+  jenisPemeriksaanId String           @map("jenis_pemeriksaan_id")
+  jenisPemeriksaan   jenisPemeriksaan @relation("jenis_pemeriksaan", fields: [jenisPemeriksaanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kuota              String // misal maks 20
+
+  @@map("kuota_harian")
+}
+
+model jadwalKlinik {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jadwal_klinik_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jadwal_klinik_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  tanggal       DateTime @db.Date
+  buka          DateTime
+  tutup         DateTime
+
+  @@map("jadwal_klinik")
+}
+
+model jadwalRutinDokter {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jadwal_rutin_dokter_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jadwal_rutin_dokter_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("jadwal_rutin_dokter", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  dokterId      String   @map("dokter_id")
+  dokter        dokter   @relation("jadwal_rutin_dokter", fields: [dokterId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  minggu        Boolean  @default(false)
+  senin         Boolean  @default(true)
+  selasa        Boolean  @default(true)
+  rabu          Boolean  @default(true)
+  kamis         Boolean  @default(true)
+  jumat         Boolean  @default(true)
+  sabtu         Boolean  @default(false)
+
+  @@unique([dokterId, faskesId])
+  @@map("jadwal_rutin_dokter")
+}
+
+model jadwalLiburDokter {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jadwal_libur_dokter_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jadwal_libur_dokter_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("jadwal_libur_dokter", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  dokterId      String   @map("dokter_id")
+  dokter        dokter   @relation("jadwal_libur_dokter", fields: [dokterId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  libur         DateTime @db.Date
+
+  @@map("jadwal_libur_dokter")
+}
+
+model jadwalPiketDokter {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jadwal_piket_dokter_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jadwal_piket_dokter_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("jadwal_piket_dokter", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  dokterId      String   @map("dokter_id")
+  dokter        dokter   @relation("jadwal_piket_dokter", fields: [dokterId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  piket         DateTime @db.Date
+
+  @@map("jadwal_piket_dokter")
+}
+
+model statusKunjunganPasien {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("status_kunjungan_pasien_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("status_kunjungan_pasien_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kode          String   @unique
+  label         String?
+
+  kunjunganPasiens kunjunganPasien[] @relation("status_kunjungan_pasien")
+
+  @@map("status_kunjungan_pasien")
+}
+
+model kunjunganPasien {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("kunjungan_pasien_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("kunjungan_pasien_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+
+  // STEP: APPOINTMENT
+  jenis        String?
+  tanggal      DateTime?              @db.Date
+  shiftPoliId  String?                @map("shift_poli_id")
+  shiftPoli    shiftPoli?             @relation("kunjungan_pasien", fields: [shiftPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  keluhanUtama String?                @map("keluhan_utama")
+  statusId     String?                @map("status_id")
+  status       statusKunjunganPasien? @relation("status_kunjungan_pasien", fields: [statusId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  pasienId     String?                @map("pasien_id")
+  pasien       pasien?                @relation("kunjungan_pasien", fields: [pasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  // STEP: PENDAFTARAN (admin pendaftaran)
+  skriningVisualAwalId String?         @map("skrining_visual_awal_id")
+  skriningVisualAwal   skriningVisual? @relation("skrining_pasien_awal", fields: [skriningVisualAwalId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  // STEP : PENGKAJIAN AWAL (perawat all)
+  dokterPoliId         String?              @map("dokter_poli_id")
+  dokterPoli           dokterPoli?          @relation("kunjungan_pasien", fields: [dokterPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  perawatPoliId        String?              @map("perawat_poli_id")
+  perawatPoli          perawatPoli?         @relation("kunjungan_pasien", fields: [perawatPoliId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  keluhanTambahan      String?              @map("keluhan_tambahan")
+  lamaSakitTahun       Int?                 @default(0) @map("lama_sakit_tahun")
+  lamaSakitBulan       Int?                 @default(0) @map("lama_sakit_bulan")
+  lamaSakitHari        Int?                 @default(0) @map("lama_sakit_hari")
+  rps                  String?
+  rpd                  String?
+  rpk                  String?
+  alergiMakanan        String?              @map("alergi_makanan")
+  alergiLainnya        String?              @map("alergi_lainnya")
+  kesadaranId          String?              @map("kesadaran_id")
+  kesadaran            kesadaran?           @relation("kunjungan_pasien", fields: [kesadaranId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  sistole              Int?
+  diastole             Int?
+  tinggiBadan          Int?                 @map("tinggi_badan")
+  caraUkurId           String?              @map("cara_ukur_id")
+  caraUkur             caraUkurTinggiBadan? @relation("kunjungan_pasien", fields: [caraUkurId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  beratBadan           Int?                 @map("berat_badan")
+  imt                  Float?
+  labelImt             String?              @map("label_imt")
+  lingkarPerut         Int?                 @map("lingkar_perut")
+  detakNadi            Int?                 @map("detak_nadi")
+  nafas                Int?
+  saturasiOksigen      Float?               @map("saturasi_oksigen")
+  suhu                 Float?
+  detakJantungId       String?              @map("detak_jantung_id")
+  detakJantung         detakJantung?        @relation("kunjungan_pasien", fields: [detakJantungId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  triageId             String?              @map("triage_id")
+  triage               triage?              @relation("kunjungan_pasien", fields: [triageId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  psikososialSpiritual String?              @map("psikologi_spiritual")
+  keterangan           String?
+
+  // STEP : SKRINING AWAL (perawat all)
+  disabilitas                 Boolean? @default(false)
+  ambulasi                    String?
+  hambatanKomunikasi          Boolean? @default(false) @map("hambatan_komunikasi")
+  tidakSeimbang               Boolean? @default(false) @map("tidak_seimbang")
+  alatBantu                   Boolean? @default(false) @map("alat_bantu")
+  menopangSaatDuduk           Boolean? @default(false) @map("menopang_saat_duduk")
+  skalaNyeri                  Int?     @default(0) @map("skala_nyeri")
+  waktuNyeriBerulang          String?  @map("waktu_nyeri_berulang")
+  sifatNyeri                  String?  @map("sifat_nyeri")
+  penurunanBeratBadan         Int?     @default(0) @map("penurunan_berat_badan")
+  resikoMalnutrisi            Int?     @default(0) @map("resiko_malnutrisi")
+  diagnosisKhusus             Boolean? @default(false) @map("diagnosis_khusus")
+  diagnosisKhususNamaPenyakit String?  @map("diagnosis_khusus_nama_penyakit")
+
+  // STEP : PEMERIKSAAN FISIK (perawat all)
+  terapiDilakukan     String?  @map("terapi_dilakukan")
+  rencanaTindakan     String?  @map("rencana_tindakan")
+  tindakanKeperawatan String?  @map("tindakan_keperawatan")
+  observasi           String?
+  merokok             Boolean? @default(false)
+  alkohol             Boolean? @default(false)
+  kurangSayurBuah     Boolean? @default(false) @map("kurang_sayur_buah")
+
+  // STEP : RIWAYAT PENGOBATAN (perawat all)
+  obatSteroid          String? @map("obat_steroid")
+  pengencerDarah       String? @map("pengencer_darah")
+  obatPengencerDahak   String? @map("obat_pengencer_dahak")
+  obatPenyakitKronik   String? @map("obat_penyakit_kronik")
+  obatLainnya          String? @map("obat_lainnya")
+  obatSeringDikonsumsi String? @map("obat_sering_dikonsumsi")
+
+  // STEP : DIAGNOSIS KEPERAWATAN (perawat all)
+  // See: kunjunganDiagnosisKeperawatans
+
+  // STEP: DIAGNOSIS DOKTER
+  // See: kunjunganDiagnosises
+  prognosaId String?   @map("prognosa_id")
+  prognosa   prognosa? @relation("prognosa", fields: [prognosaId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  // 
+
+  skriningVisualAkhirId String?         @map("skrining_visual_akhir")
+  skriningVisualAkhir   skriningVisual? @relation("skrining_pasien_akhir", fields: [skriningVisualAkhirId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  kunjunganAlergiObats           kunjunganPasienAlergiObat[]     @relation("kunjungan_pasien")
+  pemeriksaanAnatomiTubuhs       pemeriksaanAnatomiTubuh[]       @relation("kunjungan_pemeriksaan_anatomi_tubuh")
+  pemeriksaanKeadaanFisiks       pemeriksaanKeadaanFisik[]       @relation("kunjungan_pemeriksaan_keadaan_fisik")
+  kunjunganDiagnosisKeperawatans kunjunganDiagnosisKeperawatan[] @relation("kunjungan_pasien")
+  kunjunganDiagnosises           kunjunganDiagnosisDokter[]      @relation("kunjungan_penyakit_pasien")
+  kunjunganLaboratorium          kunjunganLaboratorium[]         @relation("kunjungan_laboratorium")
+
+  @@map("kunjungan_pasien")
+}
+
+model kunjunganPasienAlergiObat {
+  id                String          @id @default(cuid())
+  version           Int             @default(1)
+  createdBy         String?         @map("created_by")
+  createdByUser     user?           @relation("kunjungan_alergi_obat_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime        @map("created_at")
+  updatedBy         String?         @map("updated_by")
+  updatedByUser     user?           @relation("kunjungan_alergi_obat_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime        @map("updated_at")
+  kunjunganPasienId String          @map("kunjungan_pasien_id")
+  kunjunganPasien   kunjunganPasien @relation("kunjungan_pasien", fields: [kunjunganPasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  obatAlkesId       String          @map("obat_alkes_id")
+  obatAlkes         obatAlkes       @relation("kunjungan_pasien", fields: [obatAlkesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_pasien_alergi_obat")
+}
+
+model skriningVisual {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("skrining_visual_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("skrining_visual_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kode          String?
+  label         String
+  warna         String
+  faskesId      String   @map("faskes_id")
+  faskes        faskes   @relation("skrining_visual", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  skriningPasienSkriningAwals  kunjunganPasien[] @relation("skrining_pasien_awal")
+  skriningPasienSkriningAkhirs kunjunganPasien[] @relation("skrining_pasien_akhir")
+
+  @@unique([faskesId, kode])
+  @@map("skrining_visual")
+}
+
+model kesadaran {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("kesadaran_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("kesadaran_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  label         String?
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@map("kesadaran")
+}
+
+model caraUkurTinggiBadan {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("cara_ukur_tb_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("cara_ukur_tb_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  label         String?
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@map("cara_ukur_tinggi_badan")
+}
+
+model detakJantung {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("detak_jantung_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("detak_jantung_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  label         String?
+  color         String   @default("000000")
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@map("detak_jantung")
+}
+
+model triage {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("triage_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("triage_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  label         String?
+  color         String   @default("000000")
+
+  kunjunganPasiens kunjunganPasien[] @relation("kunjungan_pasien")
+
+  @@map("triage")
+}
+
+model pemeriksaanAnatomiTubuh {
+  id                String          @id @default(cuid())
+  version           Int             @default(1)
+  createdBy         String?         @map("created_by")
+  createdByUser     user?           @relation("pemeriksaan_anatomi_tubuh_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime        @map("created_at")
+  updatedBy         String?         @map("updated_by")
+  updatedByUser     user?           @relation("pemeriksaan_anatomi_tubuh_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime        @map("updated_at")
+  bagian            String?
+  keterangan        String?
+  koordinatX        Float?          @map("koordinat_x")
+  koordinatY        Float?          @map("koordinat_y")
+  kunjunganPasienId String          @map("kunjungan_pasien_id")
+  kunjungan         kunjunganPasien @relation("kunjungan_pemeriksaan_anatomi_tubuh", fields: [kunjunganPasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("pemeriksaan_anatomi_tubuh")
+}
+
+model pemeriksaanKeadaanFisik {
+  id                                 String                           @id @default(cuid())
+  version                            Int                              @default(1)
+  createdBy                          String?                          @map("created_by")
+  createdByUser                      user?                            @relation("pemeriksaan_keadaan_fisik_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt                          DateTime                         @map("created_at")
+  updatedBy                          String?                          @map("updated_by")
+  updatedByUser                      user?                            @relation("pemeriksaan_keadaan_fisik_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt                          DateTime                         @map("updated_at")
+  indikatorPemeriksaanKeadaanFisikId String                           @map("indikator_pemeriksaan_keadaan_fisik_id")
+  indikator                          indikatorPemeriksaanKeadaanFisik @relation("indikator_pemeriksaan_keadaan_fisik", fields: [indikatorPemeriksaanKeadaanFisikId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  keterangan                         String?
+  kunjunganPasienId                  String                           @map("kunjungan_pasien_id")
+  kunjungan                          kunjunganPasien                  @relation("kunjungan_pemeriksaan_keadaan_fisik", fields: [kunjunganPasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("pemeriksaan_keadaan_fisik")
+}
+
+model indikatorPemeriksaanKeadaanFisik {
+  id               String   @id @default(cuid())
+  version          Int      @default(1)
+  createdBy        String?  @map("created_by")
+  createdByUser    user?    @relation("indikator_pemeriksaan_fisik_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt        DateTime @map("created_at")
+  updatedBy        String?  @map("updated_by")
+  updatedByUser    user?    @relation("indikator_pemeriksaan_fisik_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt        DateTime @map("updated_at")
+  jenisPemeriksaan String?  @map("jenis_pemeriksaan")
+  indikator        String?
+  defaultValue     String?  @map("default_value")
+
+  pemeriksaanKeadaanFisiks pemeriksaanKeadaanFisik[] @relation("indikator_pemeriksaan_keadaan_fisik")
+
+  @@map("indikator_pemeriksaan_keadaan_fisik")
+}
+
+model diagnosisKeperawatan {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("diagnosis_keperawatan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("diagnosis_keperawatan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  kode          String?
+  diagnosis     String?
+
+  diagnosisKeperawatanKriterias           diagnosisKeperawatanKriteria[]           @relation("diagnosis_keperawatan_kriteria")
+  diagnosisKeperawatanIntervensis         diagnosisKeperawatanIntervensi[]         @relation("diagnosis_keperawatan_intervensi")
+  diagnosisKeperawatanIntervensiTambahans diagnosisKeperawatanIntervensiTambahan[] @relation("diagnosis_keperawatan_intervensi_tambahan")
+  kunjunganDiagnosisKeperawatans          kunjunganDiagnosisKeperawatan[]          @relation("diagnosis_keperawatan")
+
+  @@map("diagnosis_keperawatan")
+}
+
+model diagnosisKeperawatanKriteria {
+  id                     String               @id @default(cuid())
+  version                Int                  @default(1)
+  createdBy              String?              @map("created_by")
+  createdByUser          user?                @relation("diagnosis_keperawatan_kriteria_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt              DateTime             @map("created_at")
+  updatedBy              String?              @map("updated_by")
+  updatedByUser          user?                @relation("diagnosis_keperawatan_kriteria_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt              DateTime             @map("updated_at")
+  diagnosisKeperawatanId String               @map("diagnosis_keperawatan_id")
+  diagnosis              diagnosisKeperawatan @relation("diagnosis_keperawatan_kriteria", fields: [diagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kriteria               String?
+
+  kunjunganDiagnosisKeperawatanKriterias kunjunganDiagnosisKeperawatanKriteria[] @relation("kunjungan_diagnosis_keperawatan_kriteria")
+
+  @@map("diagnosis_keperawatan_kriteria")
+}
+
+model diagnosisKeperawatanIntervensi {
+  id                     String               @id @default(cuid())
+  version                Int                  @default(1)
+  createdBy              String?              @map("created_by")
+  createdByUser          user?                @relation("diagnosis_keperawatan_intervensi_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt              DateTime             @map("created_at")
+  updatedBy              String?              @map("updated_by")
+  updatedByUser          user?                @relation("diagnosis_keperawatan_intervensi_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt              DateTime             @map("updated_at")
+  diagnosisKeperawatanId String               @map("diagnosis_keperawatan_id")
+  diagnosis              diagnosisKeperawatan @relation("diagnosis_keperawatan_intervensi", fields: [diagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  intervensi             String?
+
+  kunjunganDiagnosisKeperawatanIntervensis kunjunganDiagnosisKeperawatanIntervensi[] @relation("kunjungan_diagnosis_keperawatan_intervensi")
+
+  @@map("diagnosis_keperawatan_intervensi")
+}
+
+model diagnosisKeperawatanIntervensiTambahan {
+  id                     String               @id @default(cuid())
+  version                Int                  @default(1)
+  createdBy              String?              @map("created_by")
+  createdByUser          user?                @relation("diagnosis_keperawatan_intervensi_tambahan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt              DateTime             @map("created_at")
+  updatedBy              String?              @map("updated_by")
+  updatedByUser          user?                @relation("diagnosis_keperawatan_intervensi_tambahan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt              DateTime             @map("updated_at")
+  diagnosisKeperawatanId String               @map("diagnosis_keperawatan_id")
+  diagnosis              diagnosisKeperawatan @relation("diagnosis_keperawatan_intervensi_tambahan", fields: [diagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  intervensi             String?
+
+  kunjunganDiagnosisKeperawatanIntervensiTambahans kunjunganDiagnosisKeperawatanIntervensiTambahan[] @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan")
+
+  @@map("diagnosis_keperawatan_intervensi_tambahan")
+}
+
+model kunjunganDiagnosisKeperawatan {
+  id                     String               @id @default(cuid())
+  version                Int                  @default(1)
+  createdBy              String?              @map("created_by")
+  createdByUser          user?                @relation("kunjungan_diagnosis_keperawatan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt              DateTime             @map("created_at")
+  updatedBy              String?              @map("updated_by")
+  updatedByUser          user?                @relation("kunjungan_diagnosis_keperawatan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt              DateTime             @map("updated_at")
+  kunjunganPasienId      String               @map("kunjungan_pasien_id")
+  kunjunganPasien        kunjunganPasien      @relation("kunjungan_pasien", fields: [kunjunganPasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  diagnosisKeperawatanId String               @map("diagnosis_keperawatan_id")
+  diagnosis              diagnosisKeperawatan @relation("diagnosis_keperawatan", fields: [diagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  kunjunganDiagnosisKeperawatanKriterias           kunjunganDiagnosisKeperawatanKriteria[]           @relation("kunjungan_diagnosis_keperawatan_kriteria")
+  kunjunganDiagnosisKeperawatanIntervensis         kunjunganDiagnosisKeperawatanIntervensi[]         @relation("kunjungan_diagnosis_keperawatan_intervensi")
+  kunjunganDiagnosisKeperawatanIntervensiTambahans kunjunganDiagnosisKeperawatanIntervensiTambahan[] @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan")
+
+  @@map("kunjungan_diagnosis_keperawatan")
+}
+
+model kunjunganDiagnosisKeperawatanKriteria {
+  id                              String                        @id @default(cuid())
+  version                         Int                           @default(1)
+  createdBy                       String?                       @map("created_by")
+  createdByUser                   user?                         @relation("kunjungan_diagnosis_keperawatan_kriteria_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt                       DateTime                      @map("created_at")
+  updatedBy                       String?                       @map("updated_by")
+  updatedByUser                   user?                         @relation("kunjungan_diagnosis_keperawatan_kriteria_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt                       DateTime                      @map("updated_at")
+  kunjunganDiagnosisKeperawatanId String                        @map("kunjungan_diagnosis_keperawatan_id")
+  kunjunganDiagnosisKeperawatan   kunjunganDiagnosisKeperawatan @relation("kunjungan_diagnosis_keperawatan_kriteria", fields: [kunjunganDiagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  diagnosisKeperawatanKriteriaId  String?                       @map("diagnosis_keperawatan_kriteria_id")
+  diagnosisKeperawatanKriteria    diagnosisKeperawatanKriteria? @relation("kunjungan_diagnosis_keperawatan_kriteria", fields: [diagnosisKeperawatanKriteriaId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_diagnosis_keperawatan_kriteria")
+}
+
+model kunjunganDiagnosisKeperawatanIntervensi {
+  id                               String                          @id @default(cuid())
+  version                          Int                             @default(1)
+  createdBy                        String?                         @map("created_by")
+  createdByUser                    user?                           @relation("kunjungan_diagnosis_keperawatan_intervensi_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt                        DateTime                        @map("created_at")
+  updatedBy                        String?                         @map("updated_by")
+  updatedByUser                    user?                           @relation("kunjungan_diagnosis_keperawatan_intervensi_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt                        DateTime                        @map("updated_at")
+  kunjunganDiagnosisKeperawatanId  String                          @map("kunjungan_diagnosis_keperawatan_id")
+  kunjunganDiagnosisKeperawatan    kunjunganDiagnosisKeperawatan   @relation("kunjungan_diagnosis_keperawatan_intervensi", fields: [kunjunganDiagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  diagnosisKeperawatanIntervensiId String?                         @map("diagnosis_keperawatan_intervensi_id")
+  diagnosisKeperawatanIntervensi   diagnosisKeperawatanIntervensi? @relation("kunjungan_diagnosis_keperawatan_intervensi", fields: [diagnosisKeperawatanIntervensiId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_diagnosis_keperawatan_intervensi")
+}
+
+model kunjunganDiagnosisKeperawatanIntervensiTambahan {
+  id                                       String                                  @id @default(cuid())
+  version                                  Int                                     @default(1)
+  createdBy                                String?                                 @map("created_by")
+  createdByUser                            user?                                   @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt                                DateTime                                @map("created_at")
+  updatedBy                                String?                                 @map("updated_by")
+  updatedByUser                            user?                                   @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt                                DateTime                                @map("updated_at")
+  kunjunganDiagnosisKeperawatanId          String                                  @map("kunjungan_diagnosis_keperawatan_id")
+  kunjunganDiagnosisKeperawatan            kunjunganDiagnosisKeperawatan           @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan", fields: [kunjunganDiagnosisKeperawatanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  diagnosisKeperawatanIntervensiTambahanId String?                                 @map("diagnosis_keperawatan_intervensi_tambahan_id")
+  diagnosisKeperawatanIntervensiTambahan   diagnosisKeperawatanIntervensiTambahan? @relation("kunjungan_diagnosis_keperawatan_intervensi_tambahan", fields: [diagnosisKeperawatanIntervensiTambahanId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_diagnosis_keperawatan_intervensi_tambahan")
+}
+
+model penyakit {
+  id                String   @id @default(cuid())
+  version           Int      @default(1)
+  createdBy         String?  @map("created_by")
+  createdByUser     user?    @relation("penyakit_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime @map("created_at")
+  updatedBy         String?  @map("updated_by")
+  updatedByUser     user?    @relation("penyakit_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime @map("updated_at")
+  kode              String?
+  deskripsi_singkat String?
+  deskripsi         String?
+
+  kunjunganPenyakits kunjunganDiagnosisDokter[] @relation("penyakit")
+
+  @@map("penyakit")
+}
+
+model jenisPenyakit {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("jenis_penyakit_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("jenis_penyakit_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  deskripsi     String?
+
+  kunjunganDiagnosises kunjunganDiagnosisDokter[] @relation("jenis_penyakit")
+
+  @@map("jenis_penyakit")
+}
+
+model kasusPenyakit {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("kasus_penyakit_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("kasus_penyakit_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  deskripsi     String?
+
+  kunjunganDiagnosises kunjunganDiagnosisDokter[] @relation("kasus_penyakit")
+
+  @@map("kasus_penyakit")
+}
+
+model statusDiagnosis {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("status_diagnosis_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("status_diagnosis_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  deskripsi     String?
+
+  kunjunganDiagnosises kunjunganDiagnosisDokter[] @relation("status_diagnosis")
+
+  @@map("status_diagnosis")
+}
+
+model kunjunganDiagnosisDokter {
+  id                String           @id @default(cuid())
+  version           Int              @default(1)
+  createdBy         String?          @map("created_by")
+  createdByUser     user?            @relation("kunjungan_penyakit_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt         DateTime         @map("created_at")
+  updatedBy         String?          @map("updated_by")
+  updatedByUser     user?            @relation("kunjungan_penyakit_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt         DateTime         @map("updated_at")
+  kunjunganPasienId String           @map("kunjungan_pasien_id")
+  kunjunganPasien   kunjunganPasien  @relation("kunjungan_penyakit_pasien", fields: [kunjunganPasienId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  penyakitId        String           @map("penyakit_id")
+  penyakit          penyakit         @relation("penyakit", fields: [penyakitId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  jenisPenyakitId   String?          @map("jenis_penyakit_id")
+  jenisPenyakit     jenisPenyakit?   @relation("jenis_penyakit", fields: [jenisPenyakitId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  kasusPenyakitId   String?          @map("kasus_penyakit_id")
+  kasusPenyakit     kasusPenyakit?   @relation("kasus_penyakit", fields: [kasusPenyakitId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  statusDiagnosisId String?          @map("status_diagnosis_id")
+  statusDiagnosis   statusDiagnosis? @relation("status_diagnosis", fields: [statusDiagnosisId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_diagnosis_dokter")
+}
+
+model prognosa {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("prognosa_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("prognosa_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  deskripsi     String?
+
+  kunjunganPasiens kunjunganPasien[] @relation("prognosa")
+
+  @@map("prognosa")
+}
+
+model laboratoriumJenis {
+  id            String   @id @default(cuid())
+  version       Int      @default(1)
+  createdBy     String?  @map("created_by")
+  createdByUser user?    @relation("laboratorium_jenis_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @map("created_at")
+  updatedBy     String?  @map("updated_by")
+  updatedByUser user?    @relation("laboratorium_jenis_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt     DateTime @map("updated_at")
+  label         String?
+  faskesId      String?  @map("faskes_id")
+  faskes        faskes?  @relation("faskes_laboratorium_jenis", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  laboratorium laboratorium[] @relation("laboratorium_jenis")
+
+  @@map("laboratorium_jenis")
+}
+
+model laboratorium {
+  id                  String            @id @default(cuid())
+  version             Int               @default(1)
+  createdBy           String?           @map("created_by")
+  createdByUser       user?             @relation("laboratorium_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt           DateTime          @map("created_at")
+  updatedBy           String?           @map("updated_by")
+  updatedByUser       user?             @relation("laboratorium_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt           DateTime          @map("updated_at")
+  label               String?
+  laboratoriumJenisId String            @map("jenis_id")
+  jenis               laboratoriumJenis @relation("laboratorium_jenis", fields: [laboratoriumJenisId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  faskesId            String?           @map("faskes_id")
+  faskes              faskes?           @relation("faskes_laboratorium", fields: [faskesId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  kunjunganLaboratorium kunjunganLaboratorium[] @relation("kunjungan_laboratorium")
+
+  @@map("laboratorium")
+}
+
+model kunjunganLaboratorium {
+  id             String          @id @default(cuid())
+  version        Int             @default(1)
+  createdBy      String?         @map("created_by")
+  createdByUser  user?           @relation("kunjungan_laboratorium_created", fields: [createdBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt      DateTime        @map("created_at")
+  updatedBy      String?         @map("updated_by")
+  updatedByUser  user?           @relation("kunjungan_laboratorium_updated", fields: [updatedBy], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  updatedAt      DateTime        @map("updated_at")
+  kunjunganId    String          @map("kunjungan_id")
+  kunjungan      kunjunganPasien @relation("kunjungan_laboratorium", fields: [kunjunganId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  laboratoriumId String          @map("laboratorium_id")
+  laboratorium   laboratorium    @relation("kunjungan_laboratorium", fields: [laboratoriumId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("kunjungan_laboratorium")
+}

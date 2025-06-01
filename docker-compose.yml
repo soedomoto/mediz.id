@@ -1,0 +1,118 @@
+version: '3.8'
+services:
+  db-dev:
+    image: mcr.microsoft.com/azure-sql-edge
+    ports:
+      - '1450:1433'
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: ${FASKESID_DB_PASS:-N3buL@!90piq}
+      MSSQL_DB: ${FASKESID_DB_NAME:-spidb-dev}
+    volumes:
+      - ./.volumes/db-dev/mssql:/var/opt/mssql
+      - ./.volumes/db-dev/mssql-extensibility:/var/opt/mssql-extensibility
+    networks:
+      - faskesid-network
+
+  db-postgres-dev:
+    image: postgres
+    ports:
+      - '1453:5432'
+    environment:
+      POSTGRES_PASSWORD: ${FASKESID_DB_PASS:-N3buL@!90piq}
+      POSTGRES_USER: ${FASKESID_DB_USER:-spidb-dev}
+      POSTGRES_DB: ${FASKESID_DB_NAME:-spidb-dev}
+    volumes:
+      - ./.volumes/db-postgre-dev:/var/lib/postgresql/data
+    networks:
+      - faskesid-network
+
+  db-postgres-shadow-dev:
+    image: postgres
+    ports:
+      - '1454:5432'
+    environment:
+      POSTGRES_PASSWORD: ${FASKESID_DB_PASS:-N3buL@!90piq}
+      POSTGRES_USER: ${FASKESID_DB_USER:-spidb-dev}
+      POSTGRES_DB: ${FASKESID_DB_NAME:-spidb-dev}
+    volumes:
+      - ./.volumes/db-postgre-shadow-dev:/var/lib/postgresql/data
+    networks:
+      - faskesid-network
+
+  db-init-dev:
+    image: fabiang/go-sqlcmd
+    platform: linux/amd64
+    depends_on:
+      - db-dev
+    environment:
+      MSSQL_SA_PASSWORD: ${FASKESID_DB_PASS:-N3buL@!90piq}
+      MSSQL_DB: ${FASKESID_DB_NAME:-spidb-dev}
+    entrypoint: /bin/sh -c "
+      sqlcmd -S db-dev -U sa -P 'Mikrof0n323!' -Q 'CREATE DATABASE [klinikdb-dev-shadow]'
+      && sqlcmd -S db-dev -U sa -P 'Mikrof0n323!' -Q 'CREATE DATABASE [klinikdb-dev]'
+      "
+    # entrypoint: sleep infinity
+    networks:
+      - faskesid-network
+
+  db-prod:
+    image: mysql
+    restart: on-failure
+    environment:
+      MYSQL_USER: ${FASKESID_DB_USER:-user}
+      MYSQL_PASSWORD: ${FASKESID_DB_PASS:-pass}
+      MYSQL_DATABASE: ${FASKESID_DB_NAME:-}
+      MYSQL_ROOT_PASSWORD: ${FASKESID_DB_PASS:-pass}
+    volumes:
+      - ./.volumes/db-prod:/var/lib/mysql
+    networks:
+      - faskesid-network
+
+  s3-dev:
+    image: minio/minio
+    ports:
+      - ${FASKESID_S3_PORT:-9000}:9000
+    environment:
+      MINIO_ACCESS_KEY: ${FASKESID_S3_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${FASKESID_S3_SECRET_ACCESS_KEY}
+    command: server /data
+    volumes:
+      - ./.volumes/s3-dev:/data
+    networks:
+      - faskesid-network
+
+  s3-init-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: s3-init-dev
+    image: s3-init-dev:2024.2.0
+    depends_on:
+      - s3-dev
+    environment:
+      MINIO_ACCESS_KEY: ${FASKESID_S3_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${FASKESID_S3_SECRET_ACCESS_KEY}
+      MINIO_BUCKET: ${FASKESID_S3_BUCKET}
+    entrypoint: /bin/sh /startup.sh
+    networks:
+      - faskesid-network
+
+  ubuntu-dev:
+    image: node:lts-alpine3.20
+    ports:
+      - 8086:8085
+    depends_on:
+      - db-dev
+      # - db-dev-shadow
+    # environment:
+    #   MINIO_ACCESS_KEY: ${FASKESID_S3_ACCESS_KEY_ID}
+    #   MINIO_SECRET_KEY: ${FASKESID_S3_SECRET_ACCESS_KEY}
+    command: sleep infinity
+    volumes:
+      - ./:/app
+    networks:
+      - faskesid-network
+
+networks:
+  faskesid-network:
