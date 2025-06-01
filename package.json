@@ -1,5 +1,5 @@
 {
-  "name": "example-with-tailwindcss",
+  "name": "mediz.id",
   "type": "module",
   "scripts": {
     "migrate:diff": "prisma migrate diff --from-schema-datasource ./prisma/schema.prisma --to-schema-datamodel ./prisma/schema.prisma",

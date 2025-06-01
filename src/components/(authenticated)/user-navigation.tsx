@@ -11,11 +11,18 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu"
-import { clearLoggedInUserSession, getLoggedInUserSession } from "~/sessions/logged-in-user";
+import { caller } from "~/routes/(api)/api/trpc/router";
+import { clearLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
 
-const getLoggedInUserSess = query(async ()=> {
+const getLoggedInUserSess = query(async () => {
   "use server"
-  return await getLoggedInUserSession();
+
+  const session = await useLoggedInUserSession();
+  if (!session?.data?.email) {
+    return null;
+  }
+
+  return await caller.loadUsersByEmail({ email: session.data.email || "" });
 }, "getLoggedInUser");
 
 const doLogout = action(async () => {
@@ -44,7 +51,7 @@ export function UserNavigation() {
       <DropdownMenuContent class="w-56">
         <DropdownMenuLabel class="font-normal">
           <div class="flex flex-col space-y-1">
-            <p class="text-sm font-medium leading-none">{userSess()?.user?.profile?.nama || userSess()?.user?.email}</p>
+            <p class="text-sm font-medium leading-none">{userSess()?.profile?.nama || userSess()?.email}</p>
             <p class="text-xs leading-none text-muted-foreground">{userSess()?.email}</p>
           </div>
         </DropdownMenuLabel>

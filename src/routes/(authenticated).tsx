@@ -1,22 +1,25 @@
 import { action, createAsync, query, redirect, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
 import MainNavigation from "~/components/(authenticated)/main-navigation";
 import { UserNavigation } from "~/components/(authenticated)/user-navigation";
-import { getLoggedInUserSession, updateLoggedInUserSession } from "~/sessions/logged-in-user";
+import { updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
 import { caller } from "./(api)/api/trpc/router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Suspense } from "solid-js";
 
 type RoleSelectorOption = { id: string | null, name: string | null }
 
 const checkLoggedInUser = query(async (next?: string) => {
   "use server"
 
-  const userSess = await getLoggedInUserSession();
-  if (!userSess) {
+  const session = await useLoggedInUserSession();
+  if (!session?.data?.email) {
     throw redirect("/auth/signin?next=" + encodeURIComponent(next || "/"));
   }
 
-  const roles = await caller.loadRolesAndMenusByUserId({ userId: userSess?.user?.id || "" });
-  return { user: userSess, roles };
+  const user = await caller.loadUsersByEmail({ email: session.data.email || "" });
+  const roles = await caller.loadRolesAndMenusByUserId({ userId: user?.id || "" });
+
+  return { session: session?.data, user, roles };
 }, "checkLoggedInUser");
 
 const changeRole = action(async (values: RoleSelectorOption | null) => {
@@ -56,23 +59,25 @@ export default function BlogLayout(props: RouteSectionProps) {
   const changeRoleAction = useAction(changeRole);
 
   return <>
-    <div class="border-b">
-      <div class="flex h-16 items-center px-4">
-        <MainNavigation />
-        <div class="ml-auto flex items-center space-x-4">
-          <RoleSelector 
-          roles={userSess()?.roles || []} 
-          value={userSess()?.user?.role} 
-          onChange={(value) => {
-            if (value?.id !== userSess()?.user?.role?.id) {
-              changeRoleAction(value);
-            }
-          }} 
-          />
-          <UserNavigation />
+    <Suspense fallback={<div>Loading...</div>}>
+      <div class="border-b">
+        <div class="flex h-16 items-center px-4">
+          <MainNavigation />
+          <div class="ml-auto flex items-center space-x-4">
+            {/* <RoleSelector
+              roles={userSess()?.roles || []}
+              value={userSess()?.session?.role}
+              onChange={(value) => {
+                if (userSess()?.session?.email && value?.id !== userSess()?.session?.role?.id) {
+                  changeRoleAction(value);
+                }
+              }}
+            /> */}
+            <UserNavigation />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="flex-1 space-y-4 p-8 pt-6">{props.children}</div>
+      <div class="flex-1 space-y-4 p-8 pt-6">{props.children}</div>
+    </Suspense>
   </>;
 }
