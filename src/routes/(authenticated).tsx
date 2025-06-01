@@ -1,26 +1,12 @@
-import { action, createAsync, query, redirect, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
+import { action, createAsync, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
+import { Suspense } from "solid-js";
 import MainNavigation from "~/components/(authenticated)/main-navigation";
 import { UserNavigation } from "~/components/(authenticated)/user-navigation";
-import { updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
-import { caller } from "./(api)/api/trpc/router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { Suspense } from "solid-js";
+import { getUserSession, signinIfUnauthenticated } from "~/queries";
+import { updateLoggedInUserSession } from "~/sessions/logged-in-user";
 
 type RoleSelectorOption = { id: string | null, name: string | null }
-
-const checkLoggedInUser = query(async (next?: string) => {
-  "use server"
-
-  const session = await useLoggedInUserSession();
-  if (!session?.data?.email) {
-    throw redirect("/auth/signin?next=" + encodeURIComponent(next || "/"));
-  }
-
-  const user = await caller.loadUsersByEmail({ email: session.data.email || "" });
-  const roles = await caller.loadRolesAndMenusByUserId({ userId: user?.id || "" });
-
-  return { session: session?.data, user, roles };
-}, "checkLoggedInUser");
 
 const changeRole = action(async (values: RoleSelectorOption | null) => {
   "use server"
@@ -55,7 +41,8 @@ const RoleSelector = (props: { value?: RoleSelectorOption, onChange?: (value: Ro
 
 export default function BlogLayout(props: RouteSectionProps) {
   const location = useLocation();
-  const userSess = createAsync(() => checkLoggedInUser(location.pathname));
+  createAsync(() => signinIfUnauthenticated(location.pathname));
+  const cUser = createAsync(() => getUserSession());
   const changeRoleAction = useAction(changeRole);
 
   return <>
@@ -64,15 +51,15 @@ export default function BlogLayout(props: RouteSectionProps) {
         <div class="flex h-16 items-center px-4">
           <MainNavigation />
           <div class="ml-auto flex items-center space-x-4">
-            {/* <RoleSelector
-              roles={userSess()?.roles || []}
-              value={userSess()?.session?.role}
-              onChange={(value) => {
-                if (userSess()?.session?.email && value?.id !== userSess()?.session?.role?.id) {
-                  changeRoleAction(value);
-                }
-              }}
-            /> */}
+            <RoleSelector
+              roles={(cUser()?.userRoles || []).map(ur => ur?.role)}
+              // value={userSess()?.session?.role}
+              // onChange={(value) => {
+              //   if (userSess()?.session?.email && value?.id !== userSess()?.session?.role?.id) {
+              //     changeRoleAction(value);
+              //   }
+              // }}
+            />
             <UserNavigation />
           </div>
         </div>

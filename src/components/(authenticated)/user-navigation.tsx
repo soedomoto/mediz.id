@@ -1,6 +1,6 @@
-import { action, createAsync, query, reload, useAction } from "@solidjs/router";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Button } from "~/components/ui/button"
+import { action, createAsync, reload, useAction } from "@solidjs/router";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,20 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger
-} from "~/components/ui/dropdown-menu"
-import { caller } from "~/routes/(api)/api/trpc/router";
-import { clearLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
-
-const getLoggedInUserSess = query(async () => {
-  "use server"
-
-  const session = await useLoggedInUserSession();
-  if (!session?.data?.email) {
-    return null;
-  }
-
-  return await caller.loadUsersByEmail({ email: session.data.email || "" });
-}, "getLoggedInUser");
+} from "~/components/ui/dropdown-menu";
+import { getUserSession } from "~/queries";
+import { clearLoggedInUserSession } from "~/sessions/logged-in-user";
 
 const doLogout = action(async () => {
   "use server"
@@ -33,7 +22,7 @@ const doLogout = action(async () => {
 });
 
 export function UserNavigation() {
-  const userSess = createAsync(() => getLoggedInUserSess());
+  const userSess = createAsync(() => getUserSession());
   const logoutAction = useAction(doLogout);
 
   return (
