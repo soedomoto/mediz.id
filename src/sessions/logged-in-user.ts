@@ -2,7 +2,7 @@ import { useSession } from "vinxi/http";
 
 type SessionData = {
   email?: string;
-  role?: {  id: string | null; name: string | null };
+  roleId?: string | null;
 };
 
 export async function useLoggedInUserSession() {
@@ -16,12 +16,12 @@ export async function useLoggedInUserSession() {
   return session;
 }
 
-export async function updateLoggedInUserSession(data: SessionData) {
-  "use server";
+// export async function updateLoggedInUserSession(data: SessionData) {
+//   "use server";
 
-  const session = await useLoggedInUserSession();
-  await session.update(data);
-}
+//   const session = await useLoggedInUserSession();
+//   await session.update(data);
+// }
 
 export async function clearLoggedInUserSession() {
   "use server";

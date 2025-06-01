@@ -23,10 +23,16 @@ export const signinIfUnauthenticated = query(async (next?: string): Promise<void
 export const getUserSession = query(async () => {
   "use server"
 
+  return (await useLoggedInUserSession())?.data;
+}, "getUserSession");
+
+export const getUserSessionInfo = query(async () => {
+  "use server"
+
   const session = await useLoggedInUserSession();
   if (!session?.data?.email) {
     return null;
   }
 
   return await caller.loadUsersByEmail({ email: session.data.email || "" });
-}, "getUserSession");
+}, "getUserSessionInfo");

@@ -1,18 +1,20 @@
-import { action, createAsync, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
+import { action, createAsync, reload, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
 import { Suspense } from "solid-js";
 import MainNavigation from "~/components/(authenticated)/main-navigation";
 import { UserNavigation } from "~/components/(authenticated)/user-navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { getUserSession, signinIfUnauthenticated } from "~/queries";
-import { updateLoggedInUserSession } from "~/sessions/logged-in-user";
+import { getUserSession, getUserSessionInfo, signinIfUnauthenticated } from "~/queries";
+import { useLoggedInUserSession } from "~/sessions/logged-in-user";
+import { pick, pickBy } from "lodash";
 
 type RoleSelectorOption = { id: string | null, name: string | null }
 
-const changeRole = action(async (values: RoleSelectorOption | null) => {
+const changeRole = action(async (roleId: string | null) => {
   "use server"
 
   try {
-    await updateLoggedInUserSession({ role: { id: values?.id || null, name: values?.name || null } });
+    const sess = await useLoggedInUserSession();
+    if (sess.data.roleId !== roleId) await sess.update({ roleId });
   } catch (err: Error | any) {
     return { error: true, message: err?.message };
   }
@@ -42,7 +44,8 @@ const RoleSelector = (props: { value?: RoleSelectorOption, onChange?: (value: Ro
 export default function BlogLayout(props: RouteSectionProps) {
   const location = useLocation();
   createAsync(() => signinIfUnauthenticated(location.pathname));
-  const cUser = createAsync(() => getUserSession());
+  const userSess = createAsync(() => getUserSession());
+  const userInfo = createAsync(() => getUserSessionInfo());
   const changeRoleAction = useAction(changeRole);
 
   return <>
@@ -52,13 +55,12 @@ export default function BlogLayout(props: RouteSectionProps) {
           <MainNavigation />
           <div class="ml-auto flex items-center space-x-4">
             <RoleSelector
-              roles={(cUser()?.userRoles || []).map(ur => ur?.role)}
-              // value={userSess()?.session?.role}
-              // onChange={(value) => {
-              //   if (userSess()?.session?.email && value?.id !== userSess()?.session?.role?.id) {
-              //     changeRoleAction(value);
-              //   }
-              // }}
+              roles={(userInfo()?.userRoles || []).map(ur => ur?.role)}
+              value={(userInfo()?.userRoles || []).find(ur => ur?.roleId == userSess()?.roleId)?.role}
+              onChange={async (value) => {
+                await changeRoleAction(value?.id!);
+                window.location.reload();
+              }}
             />
             <UserNavigation />
           </div>
