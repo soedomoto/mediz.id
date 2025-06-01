@@ -8,7 +8,7 @@ import { Grid } from "~/components/ui/grid";
 import { TextField, TextFieldErrorMessage, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
 import { redirectIfAuthenticated } from "~/queries";
 import { caller } from "~/routes/(api)/api/trpc/router";
-import { updateLoggedInUserSession } from "~/sessions/logged-in-user";
+import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
 type AuthForm = {
   email: string;
@@ -20,7 +20,8 @@ const doLogin = action(async (values: AuthForm) => {
 
   try {
     await caller.login(values);
-    await updateLoggedInUserSession({ email: values.email });
+    const sess = await useLoggedInUserSession();
+    await sess.update({ email: values.email });
   } catch (err: Error | any) {
     return { error: true, message: err?.message };
   }

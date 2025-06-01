@@ -12,12 +12,13 @@ import {
   DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu";
 import { getUserSessionInfo } from "~/queries";
-import { clearLoggedInUserSession } from "~/sessions/logged-in-user";
+import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
 const doLogout = action(async () => {
   "use server"
 
-  await clearLoggedInUserSession();
+  const sess = await useLoggedInUserSession();
+  await sess.clear();
   reload();
 });
 

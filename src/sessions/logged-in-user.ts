@@ -23,9 +23,9 @@ export async function useLoggedInUserSession() {
 //   await session.update(data);
 // }
 
-export async function clearLoggedInUserSession() {
-  "use server";
+// export async function clearLoggedInUserSession() {
+//   "use server";
 
-  const session = await useLoggedInUserSession();
-  await session.clear();
-}
+//   const session = await useLoggedInUserSession();
+//   await session.clear();
+// }
