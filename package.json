@@ -10,7 +10,7 @@
     "db:seed:dev": "env-cmd -f ./.env tsx ./src/bin/cmd.ts db:seed",
     "db:seed:staging": "env-cmd -f ./.env.staging tsx ./cmd/cmd.ts db:seed",
     "dev": "env-cmd -f ./.env vinxi dev",
-    "build": "vinxi build",
+    "build": "prisma generate && vinxi build",
     "start": "vinxi start"
   },
   "dependencies": {
