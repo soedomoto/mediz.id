@@ -11,7 +11,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "~/components/ui/dropdown-menu";
-import { getUserSessionInfo } from "~/queries";
+import { qGetUserSessionInfo } from "~/queries";
 import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
 const doLogout = action(async () => {
@@ -23,7 +23,7 @@ const doLogout = action(async () => {
 });
 
 export function UserNavigation() {
-  const userSess = createAsync(() => getUserSessionInfo());
+  const userSess = createAsync(() => qGetUserSessionInfo());
   const logoutAction = useAction(doLogout);
 
   return (

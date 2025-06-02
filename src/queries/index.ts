@@ -2,31 +2,37 @@ import { query, redirect } from "@solidjs/router";
 import { caller } from "~/routes/(api)/api/trpc/router";
 import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
-export const redirectIfAuthenticated = query(async (next?: string): Promise<void> => {
+export const redirectIfAuthenticated = async (next?: string): Promise<void> => {
   "use server"
 
   const session = await useLoggedInUserSession();
   if (session?.data?.email) {
     throw redirect(decodeURIComponent(next || "/"));
   }
-}, "redirectIfAuthenticated");
+}
 
-export const signinIfUnauthenticated = query(async (next?: string): Promise<void> => {
+export const qRedirectIfAuthenticated = query(redirectIfAuthenticated, "redirectIfAuthenticated");
+
+export const signinIfUnauthenticated = async (next?: string): Promise<void> => {
   "use server"
 
   const session = await useLoggedInUserSession();
   if (!session?.data?.email) {
     throw redirect("/auth/signin?next=" + encodeURIComponent(next || "/"));
   }
-}, "signinIfUnauthenticated");
+}
 
-export const getUserSession = query(async () => {
+export const qSigninIfUnauthenticated = query(signinIfUnauthenticated, "signinIfUnauthenticated");
+
+export const getUserSession = async () => {
   "use server"
 
   return (await useLoggedInUserSession())?.data;
-}, "getUserSession");
+}
 
-export const getUserSessionInfo = query(async () => {
+export const qGetUserSession = query(getUserSession, "getUserSession");
+
+export const getUserSessionInfo = async () => {
   "use server"
 
   const session = await useLoggedInUserSession();
@@ -35,4 +41,19 @@ export const getUserSessionInfo = query(async () => {
   }
 
   return await caller.loadUsersByEmail({ email: session.data.email || "" });
-}, "getUserSessionInfo");
+}
+
+export const qGetUserSessionInfo = query(getUserSessionInfo, "getUserSessionInfo");
+
+export const getMenuByRole = async () => {
+  "use server"
+
+  const session = await useLoggedInUserSession();
+  if (!session?.data?.roleId) {
+    return [];
+  }
+
+  return await caller.loadMenusByRoleId({ roleId: session?.data?.roleId });
+}
+
+export const qGetMenuByRole = query(getMenuByRole, "getMenuByRole");

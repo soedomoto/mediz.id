@@ -3,7 +3,7 @@ import { Suspense } from "solid-js";
 import MainNavigation from "~/components/(authenticated)/main-navigation";
 import { UserNavigation } from "~/components/(authenticated)/user-navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { getUserSession, getUserSessionInfo, signinIfUnauthenticated } from "~/queries";
+import { qGetUserSession, qGetUserSessionInfo, qSigninIfUnauthenticated } from "~/queries";
 import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 import { pick, pickBy } from "lodash";
 
@@ -43,9 +43,9 @@ const RoleSelector = (props: { value?: RoleSelectorOption, onChange?: (value: Ro
 
 export default function BlogLayout(props: RouteSectionProps) {
   const location = useLocation();
-  createAsync(() => signinIfUnauthenticated(location.pathname));
-  const userSess = createAsync(() => getUserSession());
-  const userInfo = createAsync(() => getUserSessionInfo());
+  createAsync(() => qSigninIfUnauthenticated(location.pathname));
+  const userSess = createAsync(() => qGetUserSession());
+  const userInfo = createAsync(() => qGetUserSessionInfo());
   const changeRoleAction = useAction(changeRole);
 
   return <>

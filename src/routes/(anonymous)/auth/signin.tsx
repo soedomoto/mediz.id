@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Callout, CalloutContent } from "~/components/ui/callout";
 import { Grid } from "~/components/ui/grid";
 import { TextField, TextFieldErrorMessage, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
-import { redirectIfAuthenticated } from "~/queries";
+import { qRedirectIfAuthenticated } from "~/queries";
 import { caller } from "~/routes/(api)/api/trpc/router";
 import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
@@ -31,7 +31,7 @@ const doLogin = action(async (values: AuthForm) => {
 
 function UserAuthForm() {
   const [param] = useSearchParams();
-  createAsync(() => redirectIfAuthenticated((param["next"] || "/") as string));
+  createAsync(() => qRedirectIfAuthenticated((param["next"] || "/") as string));
 
   const [_, { Form, Field }] = createForm<AuthForm>();
   const loginAction = useAction(doLogin);

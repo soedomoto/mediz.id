@@ -26,14 +26,14 @@ export default function (procedure: Procedure) {
         return await fnUser.loadUsersByEmail.load(input.email);
       }),
 
-    loadRolesAndMenusByUserId: procedure
+    loadMenusByRoleId: procedure
       .input(
         z.object({
-          userId: z.string(),
+          roleId: z.string(),
         }),
       )
       .query(async ({ ctx, input }) => {
-        return await fnUser.loadRolesAndMenusByUserId.load(input.userId);
+        return await fnUser.loadMenusByRoleId.load(input.roleId);
       }),
 
     getPaginatedUsers: procedure
