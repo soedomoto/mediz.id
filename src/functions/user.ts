@@ -19,7 +19,7 @@ const fnUser = {
 
   loadUsersByEmail: new DataLoader(async (emails: readonly string[]) => {
     const users = await db.user.findMany({
-      include: { profile: true },
+      include: { profile: true, userRoles: { include: { role: { select: { id: true, code: true, name: true } } } } },
       omit: { password: true },
       where: { email: { in: emails as string[] } },
     });

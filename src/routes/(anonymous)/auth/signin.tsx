@@ -1,34 +1,27 @@
+import { createForm, email, minLength, required } from "@modular-forms/solid";
+import { action, createAsync, useAction, useSearchParams, useSubmission } from "@solidjs/router";
+import { Show } from "solid-js";
 import { IconBrandGithub, IconBrandGoogle, IconCommand } from "~/components/icons";
 import { Button } from "~/components/ui/button";
+import { Callout, CalloutContent } from "~/components/ui/callout";
 import { Grid } from "~/components/ui/grid";
 import { TextField, TextFieldErrorMessage, TextFieldInput, TextFieldLabel } from "~/components/ui/text-field";
-import { createForm, email, minLength, required } from "@modular-forms/solid";
-import { action, createAsync, query, redirect, reload, useAction, useSearchParams, useSubmission } from "@solidjs/router";
+import { redirectIfAuthenticated } from "~/queries";
 import { caller } from "~/routes/(api)/api/trpc/router";
-import { Callout, CalloutContent } from "~/components/ui/callout";
-import { Show } from "solid-js";
-import { updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
+import { useLoggedInUserSession } from "~/sessions/logged-in-user";
 
 type AuthForm = {
   email: string;
   password: string;
 }
 
-const checkLoggedInUser = query(async (next?: string): Promise<void> => {
-  "use server"
-
-  const session = await useLoggedInUserSession();
-  if (session?.data?.email) {
-    throw redirect(decodeURIComponent(next || "/"));
-  }
-}, "checkLoggedInUser");
-
 const doLogin = action(async (values: AuthForm) => {
   "use server"
 
   try {
     await caller.login(values);
-    await updateLoggedInUserSession({ email: values.email });
+    const sess = await useLoggedInUserSession();
+    await sess.update({ email: values.email });
   } catch (err: Error | any) {
     return { error: true, message: err?.message };
   }
@@ -38,7 +31,7 @@ const doLogin = action(async (values: AuthForm) => {
 
 function UserAuthForm() {
   const [param] = useSearchParams();
-  createAsync(() => checkLoggedInUser((param["next"] || "/") as string));
+  createAsync(() => redirectIfAuthenticated((param["next"] || "/") as string));
 
   const [_, { Form, Field }] = createForm<AuthForm>();
   const loginAction = useAction(doLogin);

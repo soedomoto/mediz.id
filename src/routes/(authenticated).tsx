@@ -1,32 +1,20 @@
-import { action, createAsync, query, redirect, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
+import { action, createAsync, reload, RouteSectionProps, useAction, useLocation } from "@solidjs/router";
+import { Suspense } from "solid-js";
 import MainNavigation from "~/components/(authenticated)/main-navigation";
 import { UserNavigation } from "~/components/(authenticated)/user-navigation";
-import { updateLoggedInUserSession, useLoggedInUserSession } from "~/sessions/logged-in-user";
-import { caller } from "./(api)/api/trpc/router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { Suspense } from "solid-js";
+import { getUserSession, getUserSessionInfo, signinIfUnauthenticated } from "~/queries";
+import { useLoggedInUserSession } from "~/sessions/logged-in-user";
+import { pick, pickBy } from "lodash";
 
 type RoleSelectorOption = { id: string | null, name: string | null }
 
-const checkLoggedInUser = query(async (next?: string) => {
-  "use server"
-
-  const session = await useLoggedInUserSession();
-  if (!session?.data?.email) {
-    throw redirect("/auth/signin?next=" + encodeURIComponent(next || "/"));
-  }
-
-  const user = await caller.loadUsersByEmail({ email: session.data.email || "" });
-  const roles = await caller.loadRolesAndMenusByUserId({ userId: user?.id || "" });
-
-  return { session: session?.data, user, roles };
-}, "checkLoggedInUser");
-
-const changeRole = action(async (values: RoleSelectorOption | null) => {
+const changeRole = action(async (roleId: string | null) => {
   "use server"
 
   try {
-    await updateLoggedInUserSession({ role: { id: values?.id || null, name: values?.name || null } });
+    const sess = await useLoggedInUserSession();
+    if (sess.data.roleId !== roleId) await sess.update({ roleId });
   } catch (err: Error | any) {
     return { error: true, message: err?.message };
   }
@@ -55,7 +43,9 @@ const RoleSelector = (props: { value?: RoleSelectorOption, onChange?: (value: Ro
 
 export default function BlogLayout(props: RouteSectionProps) {
   const location = useLocation();
-  const userSess = createAsync(() => checkLoggedInUser(location.pathname));
+  createAsync(() => signinIfUnauthenticated(location.pathname));
+  const userSess = createAsync(() => getUserSession());
+  const userInfo = createAsync(() => getUserSessionInfo());
   const changeRoleAction = useAction(changeRole);
 
   return <>
@@ -64,15 +54,14 @@ export default function BlogLayout(props: RouteSectionProps) {
         <div class="flex h-16 items-center px-4">
           <MainNavigation />
           <div class="ml-auto flex items-center space-x-4">
-            {/* <RoleSelector
-              roles={userSess()?.roles || []}
-              value={userSess()?.session?.role}
-              onChange={(value) => {
-                if (userSess()?.session?.email && value?.id !== userSess()?.session?.role?.id) {
-                  changeRoleAction(value);
-                }
+            <RoleSelector
+              roles={(userInfo()?.userRoles || []).map(ur => ur?.role)}
+              value={(userInfo()?.userRoles || []).find(ur => ur?.roleId == userSess()?.roleId)?.role}
+              onChange={async (value) => {
+                await changeRoleAction(value?.id!);
+                window.location.reload();
               }}
-            /> */}
+            />
             <UserNavigation />
           </div>
         </div>
